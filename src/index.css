@@ -1,0 +1,115 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply antialiased;
+  }
+  body {
+    @apply bg-[#fdf5fa] text-slate-800 font-sans transition-colors duration-300;
+  }
+  .dark body {
+    @apply bg-[#0e0815] text-slate-200;
+  }
+  h1, h2, h3 {
+    @apply tracking-tight text-slate-900;
+  }
+  .dark h1, .dark h2, .dark h3 {
+    @apply text-slate-100;
+  }
+  /* 暗色下滚动条更柔和 */
+  .dark *::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  .dark *::-webkit-scrollbar-thumb {
+    @apply bg-slate-700 rounded-full;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-white rounded-xl border border-slate-200/80 shadow-sm transition-colors;
+  }
+  .dark .card {
+    @apply bg-slate-900 border-slate-800;
+  }
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Recharts tooltip customization */
+.recharts-tooltip-wrapper {
+  outline: none !important;
+}
+.recharts-default-tooltip {
+  @apply rounded-lg border border-slate-200 bg-white/95 shadow-lg !important;
+}
+.dark .recharts-default-tooltip {
+  @apply border-slate-700 bg-slate-900/95 !important;
+}
+.recharts-tooltip-label {
+  @apply text-slate-900 font-medium !important;
+}
+.dark .recharts-tooltip-label {
+  @apply text-slate-100 !important;
+}
+.dark .recharts-cartesian-grid line {
+  stroke: #334155 !important;
+}
+.dark .recharts-polar-grid line,
+.dark .recharts-polar-grid path {
+  stroke: #334155 !important;
+}
+.dark .recharts-polar-angle-axis-tick text {
+  fill: #94a3b8 !important;
+}
+.dark .recharts-polar-radius-axis-tick text {
+  fill: #64748b !important;
+}
+
+/* ——— 动效 keyframes ——— */
+@keyframes float-y {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-14px); }
+}
+.animate-float-slow {
+  animation: float-y 7s ease-in-out infinite;
+}
+
+@keyframes hero-shimmer {
+  0% { transform: translateX(0) skewX(-12deg); }
+  60%, 100% { transform: translateX(500%) skewX(-12deg); }
+}
+.hero-shimmer {
+  animation: hero-shimmer 5.5s ease-in-out infinite;
+}
+
+/* 尊重系统「减少动态效果」偏好 */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* SVG 组件（学习路径图等）暗色覆盖 */
+.dark svg rect[fill="white"] {
+  fill: #0f172a;
+}
+.dark svg rect[stroke="#e2e8f0"] {
+  stroke: #334155;
+}
+.dark svg path[stroke="#cbd5e1"] {
+  stroke: #475569;
+}
+.dark svg polygon[fill="#cbd5e1"] {
+  fill: #475569;
+}
