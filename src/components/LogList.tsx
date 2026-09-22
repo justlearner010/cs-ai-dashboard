@@ -15,13 +15,24 @@ interface LogListProps {
 
 export function LogList({ courses, logs, onEdit, onDelete, onBatchDelete }: LogListProps) {
   const [filter, setFilter] = useState('');
+  const [query, setQuery] = useState('');
   const [isBatchMode, setIsBatchMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
   const filtered = useMemo(() => {
-    const list = filter ? logs.filter(l => l.course.includes(filter)) : logs;
+    const q = query.trim().toLowerCase();
+    const list = logs.filter(l => {
+      // 与 DailyLogForm 存储格式一致的全串精确匹配（phase — name）
+      if (filter && l.course !== filter) return false;
+      if (!q) return true;
+      return [l.course, l.date, l.knowledge, l.lab, l.questions, l.reflection].some(
+        v => (v ?? '').toLowerCase().includes(q),
+      );
+    });
     return [...list].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-  }, [logs, filter]);
+  }, [logs, filter, query]);
+
+  const hasCriteria = Boolean(filter || query.trim());
 
   const toggleSelection = (id: string) => {
     setSelectedIds(prev => {
@@ -42,7 +53,6 @@ export function LogList({ courses, logs, onEdit, onDelete, onBatchDelete }: LogL
 
   const handleBatchDelete = () => {
     if (selectedIds.size === 0) return;
-    if (!confirm(`确定删除选中的 ${selectedIds.size} 条日志？此操作不可恢复。`)) return;
     onBatchDelete(Array.from(selectedIds));
     setSelectedIds(new Set());
     setIsBatchMode(false);
@@ -65,7 +75,7 @@ export function LogList({ courses, logs, onEdit, onDelete, onBatchDelete }: LogL
             </span>
           )}
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {isBatchMode ? (
             <>
               <button
@@ -101,17 +111,31 @@ export function LogList({ courses, logs, onEdit, onDelete, onBatchDelete }: LogL
               <CheckSquare className="w-3.5 h-3.5" /> 批量管理
             </button>
           )}
+          <input
+            type="search"
+            value={query}
+            onChange={e => {
+              setQuery(e.target.value);
+              setSelectedIds(new Set());
+            }}
+            placeholder="搜索日志…"
+            aria-label="搜索学习日志"
+            className="rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 w-full sm:w-auto sm:min-w-[9rem]"
+          />
           <select
             value={filter}
             onChange={e => {
               setFilter(e.target.value);
               setSelectedIds(new Set());
             }}
+            aria-label="按课程筛选日志"
             className="rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 w-full sm:w-auto"
           >
             <option value="">全部课程</option>
             {courses.map(c => (
-              <option key={c.id} value={c.name}>{c.name}</option>
+              <option key={c.id} value={`${c.phase} — ${c.name}`}>
+                {c.phase} — {c.name}
+              </option>
             ))}
           </select>
         </div>
@@ -121,14 +145,14 @@ export function LogList({ courses, logs, onEdit, onDelete, onBatchDelete }: LogL
         {filtered.length === 0 ? (
           <EmptyState
             icon={BookOpen}
-            title={filter ? '该课程暂无日志' : '还没有学习日志'}
+            title={hasCriteria ? '没有匹配的日志' : '还没有学习日志'}
             description={
-              filter
-                ? '切换其他课程看看，或去写一条新日志。'
+              hasCriteria
+                ? '换个关键词或课程筛选试试，或清空条件看全部。'
                 : '完成一项任务后，来这里记录今天的知识点、Lab 和反思。'
             }
             action={
-              !filter
+              !hasCriteria
                 ? {
                     label: '去写日志',
                     onClick: () => {
@@ -190,6 +214,7 @@ function LogItem({ log, isBatchMode, isSelected, onToggleSelect, onEdit, onDelet
                 e.stopPropagation();
                 onToggleSelect();
               }}
+              aria-label={`选择 ${log.date} 的日志`}
               className="h-4 w-4 rounded border-slate-300 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 text-brand-600 focus:ring-brand-500 cursor-pointer"
             />
           )}
@@ -206,9 +231,7 @@ function LogItem({ log, isBatchMode, isSelected, onToggleSelect, onEdit, onDelet
               <Pencil className="w-3.5 h-3.5" /> 编辑
             </button>
             <button
-              onClick={() => {
-                if (confirm('删除这条日志？')) onDelete(log.id);
-              }}
+              onClick={() => onDelete(log.id)}
               className="inline-flex items-center gap-1 text-xs text-red-600 hover:text-red-700 font-medium"
             >
               <Trash2 className="w-3.5 h-3.5" /> 删除

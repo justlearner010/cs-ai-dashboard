@@ -51,6 +51,11 @@ export interface AppData {
   exportedAt?: string;
 }
 
+/** 导入结果：失败时带具体原因，成功时带回实际导入条数 */
+export type ImportResult =
+  | { ok: true; courseCount: number | null; logCount: number | null }
+  | { ok: false; error: string };
+
 export interface SkillDimension {
   key: string;
   label: string;

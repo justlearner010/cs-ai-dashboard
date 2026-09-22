@@ -157,6 +157,7 @@ export function Heatmap({ logs, days = 365 }: HeatmapProps) {
                       <div
                         key={col}
                         title={`${cell.key} · ${cell.hours.toFixed(1)} 小时`}
+                        aria-label={`${cell.key} · ${cell.hours.toFixed(1)} 小时`}
                         onClick={() => toggleSelect(cell.key)}
                         className={`w-3 h-3 rounded-sm ${cell.levelClass} cursor-pointer transition-all duration-150 hover:ring-2 hover:ring-slate-400 hover:scale-125 ${
                           isSelected ? 'ring-2 ring-brand-500 scale-125' : ''
@@ -203,6 +204,7 @@ export function Heatmap({ logs, days = 365 }: HeatmapProps) {
                     onClick={() => setSelectedDate(null)}
                     className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
                     title="关闭"
+                    aria-label="关闭当日详情"
                   >
                     <X className="w-4 h-4" />
                   </button>

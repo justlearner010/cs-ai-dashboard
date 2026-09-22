@@ -90,6 +90,18 @@
   animation: hero-shimmer 5.5s ease-in-out infinite;
 }
 
+/* Hero 横幅呼吸缩放（替代 framer 循环动画） */
+@keyframes hero-breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.035); }
+}
+
+/* 统计卡片入场（index * 80ms 错峰） */
+@keyframes stats-enter {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 /* 尊重系统「减少动态效果」偏好 */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

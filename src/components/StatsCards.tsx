@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion';
 import { Percent, CheckCircle2, Flame, Clock } from 'lucide-react';
 import type { Course, LogEntry } from '../types';
 import { overallProgress, computeStreak, totalHours } from '../utils/helpers';
@@ -59,28 +58,24 @@ export function StatsCards({ courses, logs }: StatsCardsProps) {
       {items.map((item, index) => {
         const Icon = item.icon;
         return (
-          <motion.div
+          <div
             key={index}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: index * 0.08, ease: 'easeOut' }}
             className="card p-3 sm:p-4 flex items-center gap-3 sm:gap-4"
+            style={{
+              animation: 'stats-enter 0.4s ease-out both',
+              animationDelay: `${index * 80}ms`,
+            }}
           >
             <div className={`p-2.5 sm:p-3 rounded-xl ${item.bg} shrink-0`}>
               <Icon className={`w-5 h-5 sm:w-6 sm:h-6 ${item.color}`} />
             </div>
             <div className="min-w-0">
               <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">{item.label}</p>
-              <motion.p
-                key={item.raw}
-                initial={{ opacity: 0.5 }}
-                animate={{ opacity: 1 }}
-                className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-slate-100 tabular-nums"
-              >
+              <p className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-slate-100 tabular-nums">
                 {item.value}
-              </motion.p>
+              </p>
             </div>
-          </motion.div>
+          </div>
         );
       })}
     </section>

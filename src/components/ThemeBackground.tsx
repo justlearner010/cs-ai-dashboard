@@ -1,5 +1,4 @@
 import { Sparkles } from 'lucide-react';
-import { motion, useReducedMotion } from 'framer-motion';
 
 /**
  * It's MyGO 主题背景层
@@ -105,32 +104,26 @@ export function ThemeBackground() {
  * 宽度与下方内容对齐（与 max-w-7xl 容器同宽），按原图比例完整显示5 个角色，不拉伸。
  */
 export function MyGoHero() {
-  const reduce = useReducedMotion();
   return (
     <div className="relative rounded-xl overflow-hidden border border-brand-200/50
                     bg-gradient-to-r from-brand-50/70 via-white/70 to-brand-50/70
                     dark:from-brand-900/20 dark:via-slate-900/50 dark:to-brand-900/20
                     dark:border-brand-800/50">
-      <motion.img
+      <img
         src={`${import.meta.env.BASE_URL}MyGO!!!!!_10th_anniversary_kv_banner_v2.webp`}
         alt="MyGO!!!!! 角色图（官方素材）"
-        className="w-full h-auto block object-contain bg-slate-50 dark:bg-slate-900 opacity-95"
+        width={1600}
+        height={700}
+        className="w-full h-auto block object-contain bg-slate-50 dark:bg-slate-900 opacity-95
+                   animate-[hero-breathe_16s_ease-in-out_infinite] motion-reduce:animate-none"
         loading="eager"
         draggable={false}
         onError={e => (e.currentTarget.parentElement!.style.display = 'none')}
-        animate={reduce ? undefined : { scale: [1, 1.035, 1] }}
-        transition={
-          reduce
-            ? undefined
-            : { duration: 16, ease: 'easeInOut', repeat: Infinity }
-        }
       />
-      {/* 光泽扫过（reduced-motion 时不渲染） */}
-      {!reduce && (
-        <div aria-hidden className="absolute inset-0 pointer-events-none overflow-hidden">
-          <div className="hero-shimmer absolute inset-y-0 -left-1/2 w-1/3 bg-gradient-to-r from-transparent via-white/25 to-transparent" />
-        </div>
-      )}
+      {/* 光泽扫过（reduced-motion 时隐藏） */}
+      <div aria-hidden className="absolute inset-0 pointer-events-none overflow-hidden motion-reduce:hidden">
+        <div className="hero-shimmer absolute inset-y-0 -left-1/2 w-1/3 bg-gradient-to-r from-transparent via-white/25 to-transparent" />
+      </div>
       {/* 底部渐变 fade-out，让横幅与下方内容平滑过渡 */}
       <div className="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-[#fdf5fa] dark:from-[#0e0815] to-transparent pointer-events-none" />
     </div>

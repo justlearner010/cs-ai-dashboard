@@ -105,6 +105,7 @@ function SortableTodoItem({ todo, courseId, onToggle, onDelete, onSetDueDate }, 
           {...listeners}
           className="mt-0.5 p-0.5 text-slate-300 hover:text-slate-500 dark:text-slate-400 cursor-grab active:cursor-grabbing opacity-0 group-hover:opacity-100 transition-opacity"
           title="拖动排序"
+          aria-label="拖动排序"
         >
           <GripVertical className="w-3.5 h-3.5" />
         </button>
@@ -112,6 +113,7 @@ function SortableTodoItem({ todo, courseId, onToggle, onDelete, onSetDueDate }, 
           type="checkbox"
           checked={todo.done}
           onChange={() => onToggle(courseId, todo.id)}
+          aria-label={todo.text}
           className="mt-0.5 h-4 w-4 rounded border-slate-300 dark:border-slate-600 text-brand-600 focus:ring-brand-500 cursor-pointer shrink-0"
         />
         <span
@@ -141,6 +143,7 @@ function SortableTodoItem({ todo, courseId, onToggle, onDelete, onSetDueDate }, 
             onClick={() => setShowDate(v => !v)}
             className="opacity-0 group-hover:opacity-100 text-slate-400 dark:text-slate-500 hover:text-brand-600 p-1 rounded transition-all shrink-0"
             title="设置截止日期"
+            aria-label="设置截止日期"
           >
             <CalendarDays className="w-3.5 h-3.5" />
           </button>
@@ -149,6 +152,7 @@ function SortableTodoItem({ todo, courseId, onToggle, onDelete, onSetDueDate }, 
           onClick={() => onDelete(courseId, todo.id)}
           className="opacity-0 group-hover:opacity-100 text-slate-400 dark:text-slate-500 hover:text-red-600 p-1 rounded transition-all shrink-0"
           title="删除"
+          aria-label="删除任务"
         >
           <Trash2 className="w-3.5 h-3.5" />
         </button>
@@ -159,11 +163,13 @@ function SortableTodoItem({ todo, courseId, onToggle, onDelete, onSetDueDate }, 
             type="date"
             value={todo.dueDate ?? ''}
             onChange={e => onSetDueDate(courseId, todo.id, e.target.value || undefined)}
+            aria-label={`设置「${todo.text}」的截止日期`}
             className="rounded-md border border-slate-300 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200 px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500"
           />
           {todo.dueDate && (
             <button
               onClick={() => onSetDueDate(courseId, todo.id, undefined)}
+              aria-label="清除截止日期"
               className="text-xs text-slate-400 hover:text-red-600 transition-colors"
             >
               清除

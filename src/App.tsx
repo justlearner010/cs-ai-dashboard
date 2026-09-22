@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, Suspense, lazy } from "react";
-import type { AppData, Course, LogEntry, Todo, TodoType } from "./types";
+import type { AppData, Course, ImportResult, LogEntry, Todo, TodoType } from "./types";
 import { useLocalStorage } from "./hooks/useLocalStorage";
 import { useDarkMode } from "./hooks/useDarkMode";
 import { initDefaultCourses } from "./data/courses";
@@ -14,6 +14,7 @@ import { MobileNav } from "./components/MobileNav";
 import { ScrollProgress } from "./components/ScrollProgress";
 import { TodayFocus } from "./components/TodayFocus";
 import { useTaskReminders } from "./hooks/useTaskReminders";
+import { useToast } from "./hooks/useToast";
 import { ThemeBackground, MyGoHero } from "./components/ThemeBackground";
 import { Reveal } from "./components/Reveal";
 import { ErrorBoundary } from "./components/ErrorBoundary";
@@ -44,6 +45,25 @@ const COURSES_KEY = "csAiAgentCoursesV3";
 const LOGS_KEY = "csAiAgentLogsV3";
 const LEGACY_COURSES_KEY = "csAiAgentCoursesV2";
 const LEGACY_LOGS_KEY = "csAiAgentLogs";
+const LAST_BACKUP_KEY = "csAiAgentLastBackupAt";
+
+// 解析失败过的 key：挂载合并时跳过写回，避免用 fallback 覆盖损坏原文
+const corruptKeys = new Set<string>();
+let corruptToastShown = false;
+// 配额/写入失败提示：每个 key 每个会话只提醒一次
+const writeErrorNotified = new Set<string>();
+
+function backupCorrupt(key: string, raw: string): void {
+  try {
+    let target = `${key}.corrupt`;
+    if (window.localStorage.getItem(target) !== null) {
+      target = `${key}.corrupt.${Date.now()}`;
+    }
+    window.localStorage.setItem(target, raw);
+  } catch {
+    // 备份失败不阻断：主流程已回退到安全值
+  }
+}
 
 function normalizeCourses(saved: Course[]): Course[] {
   const defaults = initDefaultCourses();
@@ -78,39 +98,96 @@ function normalizeCourses(saved: Course[]): Course[] {
 
 function safeParseCourses(raw: string): Course[] {
   try {
-    return normalizeCourses(JSON.parse(raw) as Course[]);
+    const parsed: unknown = JSON.parse(raw);
+    if (!Array.isArray(parsed)) throw new Error("courses is not an array");
+    return normalizeCourses(parsed as Course[]);
   } catch (error) {
     console.warn("Failed to parse saved courses:", error);
+    corruptKeys.add(COURSES_KEY);
+    backupCorrupt(COURSES_KEY, raw);
     return initDefaultCourses();
   }
 }
 
 function safeParseLogs(raw: string): LogEntry[] {
   try {
-    return JSON.parse(raw) as LogEntry[];
+    const parsed: unknown = JSON.parse(raw);
+    if (!Array.isArray(parsed)) throw new Error("logs is not an array");
+    return parsed as LogEntry[];
   } catch (error) {
     console.warn("Failed to parse saved logs:", error);
+    corruptKeys.add(LOGS_KEY);
+    backupCorrupt(LOGS_KEY, raw);
     return [];
   }
 }
 
+/** 结构校验导入数据；合法返回 null，否则返回具体的中文错误说明 */
+function validateAppData(data: unknown): string | null {
+  if (typeof data !== "object" || data === null || Array.isArray(data)) {
+    return "根节点必须是 JSON 对象";
+  }
+  const d = data as { courses?: unknown; logs?: unknown };
+  if (d.courses === undefined && d.logs === undefined) {
+    return "缺少 courses / logs 字段";
+  }
+  if (d.courses !== undefined) {
+    if (!Array.isArray(d.courses)) return "courses 必须是数组";
+    for (const c of d.courses) {
+      if (
+        typeof c !== "object" ||
+        c === null ||
+        typeof (c as { id?: unknown }).id !== "string" ||
+        !Array.isArray((c as { todos?: unknown }).todos)
+      ) {
+        return "课程项缺少 id 或 todos 字段";
+      }
+    }
+  }
+  if (d.logs !== undefined) {
+    if (!Array.isArray(d.logs)) return "logs 必须是数组";
+    for (const l of d.logs) {
+      if (
+        typeof l !== "object" ||
+        l === null ||
+        typeof (l as { id?: unknown }).id !== "string" ||
+        typeof (l as { date?: unknown }).date !== "string"
+      ) {
+        return "日志项缺少 id 或 date 字段";
+      }
+    }
+  }
+  return null;
+}
+
 export default function App() {
-  const [savedCourses, setSavedCourses] = useLocalStorage<Course[]>(
+  const { toast } = useToast();
+  const notifyWriteError = useCallback(() => {
+    // courses/logs 共用一条提示，每会话只提醒一次
+    if (writeErrorNotified.has("any")) return;
+    writeErrorNotified.add("any");
+    toast("保存失败，浏览器存储可能已满，请立即导出备份", { duration: 8000 });
+  }, [toast]);
+  const [courses, setCourses] = useLocalStorage<Course[]>(
     COURSES_KEY,
     initDefaultCourses,
     {
       parse: (raw) => safeParseCourses(raw),
+      onWriteError: notifyWriteError,
     },
   );
-  const [savedLogs, setSavedLogs] = useLocalStorage<LogEntry[]>(
+  const [logs, setLogs] = useLocalStorage<LogEntry[]>(
     LOGS_KEY,
     () => [],
     {
       parse: (raw) => safeParseLogs(raw),
+      onWriteError: notifyWriteError,
     },
   );
-  const [courses, setCourses] = useState<Course[]>(savedCourses);
-  const [logs, setLogs] = useState<LogEntry[]>(savedLogs);
+  const [lastBackupAt, setLastBackupAt] = useLocalStorage<string | null>(
+    LAST_BACKUP_KEY,
+    () => null,
+  );
   const [editingLog, setEditingLog] = useState<LogEntry | null>(null);
   const [backupPayload, setBackupPayload] = useState<BackupPayload | null>(
     null,
@@ -122,6 +199,15 @@ export default function App() {
 
   // 页面打开期间，每天最多一次「逾期/今天到期」浏览器通知
   useTaskReminders(courses);
+
+  // 有 key 解析失败过：一次性告知用户（原始值已备份到 *.corrupt）
+  useEffect(() => {
+    if (corruptKeys.size === 0 || corruptToastShown) return;
+    corruptToastShown = true;
+    toast("本地数据解析失败，原始值已备份到 *.corrupt 键，本次先展示默认内容", {
+      duration: 8000,
+    });
+  }, [toast]);
 
   // Migrate from legacy V2 keys if V3 is empty
   useEffect(() => {
@@ -140,25 +226,17 @@ export default function App() {
       const nextLogs = v2Logs ? (JSON.parse(v2Logs) as LogEntry[]) : [];
       setCourses(nextCourses);
       setLogs(nextLogs);
-      setSavedCourses(nextCourses);
-      setSavedLogs(nextLogs);
     } catch (error) {
       console.warn("Failed to migrate legacy data:", error);
     }
-  }, [setSavedCourses, setSavedLogs]);
-
-  useEffect(() => {
-    setSavedCourses(courses);
-  }, [courses, setSavedCourses]);
-
-  useEffect(() => {
-    setSavedLogs(logs);
-  }, [logs, setSavedLogs]);
+  }, [setCourses, setLogs]);
 
   // 兜底：合并“新增的默认课程”
   // localStorage 里已存有旧课程列表时，新增的默认课程只在解析（页面加载）时合并一次。
   // HMR/Fast Refresh 会保留 React state，导致新课程看不到——挂载时再合并一次即可自愈。
+  // 解析失败过的 key 必须跳过，否则会把 fallback 写回、覆盖损坏原文。
   useEffect(() => {
+    if (corruptKeys.has(COURSES_KEY)) return;
     setCourses((prev) => {
       const merged = normalizeCourses(prev);
       const same =
@@ -224,14 +302,39 @@ export default function App() {
     [],
   );
 
-  const handleDeleteTodo = useCallback((courseId: string, todoId: string) => {
-    setCourses((prev) =>
-      prev.map((c) => {
-        if (c.id !== courseId) return c;
-        return { ...c, todos: c.todos.filter((t) => t.id !== todoId) };
-      }),
-    );
-  }, []);
+  const handleDeleteTodo = useCallback(
+    (courseId: string, todoId: string) => {
+      const course = courses.find((c) => c.id === courseId);
+      const index = course?.todos.findIndex((t) => t.id === todoId) ?? -1;
+      if (!course || index < 0) return;
+      const removed = course.todos[index];
+      setCourses((prev) =>
+        prev.map((c) =>
+          c.id === courseId
+            ? { ...c, todos: c.todos.filter((t) => t.id !== todoId) }
+            : c,
+        ),
+      );
+      const label =
+        removed.text.length > 16 ? `${removed.text.slice(0, 16)}…` : removed.text;
+      toast(`已删除任务「${label}」`, {
+        action: {
+          label: "撤销",
+          onAction: () =>
+            setCourses((prev) =>
+              prev.map((c) => {
+                if (c.id !== courseId || c.todos.some((t) => t.id === removed.id))
+                  return c;
+                const next = [...c.todos];
+                next.splice(Math.min(index, next.length), 0, removed);
+                return { ...c, todos: next };
+              }),
+            ),
+        },
+      });
+    },
+    [courses, setCourses, toast],
+  );
 
   const handleSaveLog = useCallback((entry: LogEntry) => {
     setLogs((prev) => {
@@ -252,13 +355,48 @@ export default function App() {
     form?.scrollIntoView({ behavior: "smooth", block: "start" });
   }, []);
 
-  const handleDeleteLog = useCallback((id: string) => {
-    setLogs((prev) => prev.filter((l) => l.id !== id));
-  }, []);
+  const handleDeleteLog = useCallback(
+    (id: string) => {
+      const index = logs.findIndex((l) => l.id === id);
+      if (index < 0) return;
+      const removed = logs[index];
+      setLogs((prev) => prev.filter((l) => l.id !== id));
+      toast("已删除 1 条日志", {
+        action: {
+          label: "撤销",
+          onAction: () =>
+            setLogs((prev) => {
+              if (prev.some((l) => l.id === removed.id)) return prev;
+              const next = [...prev];
+              next.splice(Math.min(index, next.length), 0, removed);
+              return next;
+            }),
+        },
+      });
+    },
+    [logs, setLogs, toast],
+  );
 
-  const handleBatchDeleteLogs = useCallback((ids: string[]) => {
-    setLogs((prev) => prev.filter((l) => !ids.includes(l.id)));
-  }, []);
+  const handleBatchDeleteLogs = useCallback(
+    (ids: string[]) => {
+      const idSet = new Set(ids);
+      const removed = logs.filter((l) => idSet.has(l.id));
+      if (removed.length === 0) return;
+      setLogs((prev) => prev.filter((l) => !idSet.has(l.id)));
+      toast(`已删除 ${removed.length} 条日志`, {
+        action: {
+          label: "撤销",
+          onAction: () =>
+            setLogs((prev) => {
+              const existing = new Set(prev.map((l) => l.id));
+              const restored = removed.filter((r) => !existing.has(r.id));
+              return restored.length > 0 ? [...prev, ...restored] : prev;
+            }),
+        },
+      });
+    },
+    [logs, setLogs, toast],
+  );
 
   const handleReorderTodos = useCallback(
     (courseId: string, newTodos: Todo[]) => {
@@ -284,36 +422,29 @@ export default function App() {
     a.download = `cs-ai-agent-${today()}.json`;
     a.click();
     URL.revokeObjectURL(url);
-  }, [courses, logs]);
+    setLastBackupAt(new Date().toISOString());
+  }, [courses, logs, setLastBackupAt]);
 
-  const handleImport = useCallback((data: AppData) => {
-    if (data.courses) {
-      // Merge imported progress with current default structure to avoid missing new todos
-      const defaultCourses = initDefaultCourses();
-      const merged = defaultCourses.map((def) => {
-        const imported = data.courses.find((c) => c.id === def.id);
-        if (!imported) return def;
-        const todos = def.todos.map((dt) => {
-          const it = imported.todos.find((t) => t.id === dt.id);
-          return it ? { ...dt, done: it.done, dueDate: it.dueDate } : dt;
-        });
-        // Preserve any custom todos from import that are not in default
-        const customTodos = imported.todos.filter(
-          (t) => !def.todos.some((dt) => dt.id === t.id),
-        );
-        return { ...def, todos: [...todos, ...customTodos] };
-      });
-      setCourses(merged);
-    }
-    if (data.logs) {
-      setLogs(data.logs);
-    }
-  }, []);
+  const handleImport = useCallback(
+    (data: AppData): ImportResult => {
+      const error = validateAppData(data);
+      if (error) return { ok: false, error };
+      if (data.courses) setCourses(normalizeCourses(data.courses));
+      if (data.logs) setLogs(data.logs);
+      return {
+        ok: true,
+        courseCount: data.courses ? data.courses.length : null,
+        logCount: data.logs ? data.logs.length : null,
+      };
+    },
+    [setCourses, setLogs],
+  );
 
   const handleBackup = useCallback(() => {
     const payload = generateBackupContent(courses, logs);
     setBackupPayload(payload);
-  }, [courses, logs]);
+    setLastBackupAt(new Date().toISOString());
+  }, [courses, logs, setLastBackupAt]);
 
   const handleSelectCourseFromPath = useCallback((courseId: string) => {
     const element = document.getElementById(`course-${courseId}`);
@@ -335,6 +466,7 @@ export default function App() {
         onExport={handleExport}
         onImport={handleImport}
         onBackup={handleBackup}
+        lastBackupAt={lastBackupAt}
         isDark={isDark}
         onToggleDark={toggleDark}
       />

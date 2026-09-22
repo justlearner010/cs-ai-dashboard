@@ -94,6 +94,7 @@ const FocusRow = forwardRef<
         checked={item.todo.done}
         onChange={() => onToggleTodo(item.course.id, item.todo.id)}
         onClick={e => e.stopPropagation()}
+        aria-label={item.todo.text}
         className="h-4 w-4 rounded border-slate-300 dark:border-slate-600 text-brand-600 focus:ring-brand-500 cursor-pointer shrink-0"
       />
       <div className="min-w-0 flex-1">
@@ -111,7 +112,17 @@ const FocusRow = forwardRef<
           {badge.label}
         </span>
       )}
-      <ArrowUpRight className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 shrink-0" />
+      <button
+        type="button"
+        aria-label={`跳转到 ${item.course.name}`}
+        onClick={e => {
+          e.stopPropagation();
+          onJumpToCourse(item.course.id);
+        }}
+        className="p-0.5 rounded shrink-0 text-slate-400 dark:text-slate-500 hover:text-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-500"
+      >
+        <ArrowUpRight className="w-3.5 h-3.5" />
+      </button>
     </motion.li>
   );
 });

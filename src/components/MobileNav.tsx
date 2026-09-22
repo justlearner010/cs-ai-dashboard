@@ -34,6 +34,7 @@ export function MobileNav() {
               key={item.id}
               ref={active ? activeRef : undefined}
               onClick={() => jumpTo(item.id)}
+              aria-current={active ? 'true' : undefined}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors shrink-0 ${
                 active
                   ? 'bg-brand-600 text-white shadow-sm'
