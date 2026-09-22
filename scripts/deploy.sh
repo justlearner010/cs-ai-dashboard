@@ -8,9 +8,7 @@ git add -A
 if git diff --cached --quiet; then
   echo "无改动，仅执行 push"
 else
-  git commit -m "deploy: $(date '+%F %T')
-
-Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>"
+  git commit -m "deploy: $(date '+%F %T')"
 fi
 git push
 echo "已推送，GitHub Actions 正在构建部署 → https://justlearner010.github.io/cs-ai-dashboard/"
