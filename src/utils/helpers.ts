@@ -55,16 +55,38 @@ export function computeSkillRadarData(courses: Course[]): SkillRadarPoint[] {
   });
 }
 
+/** 按本地时区把 YYYY-MM-DD 解析为当地零点（toISOString 的 UTC 口径会在负时区差一天） */
+export function parseLocalDate(dateStr: string): Date {
+  const [y, m, d] = dateStr.split('-').map(Number);
+  if (!y || !m || !d) return new Date(dateStr);
+  return new Date(y, m - 1, d);
+}
+
+/** 本地时区自然日 YYYY-MM-DD（streak / 截止日 / 表单默认日期共用此口径） */
+export function today(): string {
+  const now = new Date();
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+}
+
+/**
+ * 连续打卡天数（纯派生，无独立存储）。
+ * 口径：按日志 date 字段、本地时区自然日；最近一天是今天或昨天为「活着」，
+ * 中间断档或无日志归零，无宽限期。
+ */
 export function computeStreak(logs: LogEntry[]): number {
   if (logs.length === 0) return 0;
-  const dates = [...new Set(logs.map(l => l.date))].sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
+  const dates = [...new Set(logs.map(l => l.date))].sort(
+    (a, b) => parseLocalDate(b).getTime() - parseLocalDate(a).getTime(),
+  );
   let streak = 0;
   const check = new Date();
   check.setHours(0, 0, 0, 0);
   for (const d of dates) {
-    const cur = new Date(d);
+    const cur = parseLocalDate(d);
     cur.setHours(0, 0, 0, 0);
-    const diff = (check.getTime() - cur.getTime()) / (1000 * 60 * 60 * 24);
+    // Math.round 吸收夏令时 23/25 小时日的偏差
+    const diff = Math.round((check.getTime() - cur.getTime()) / (1000 * 60 * 60 * 24));
     if (diff <= 1) {
       streak++;
       check.setTime(cur.getTime());
@@ -94,10 +116,6 @@ export function moodLabel(m: string): string {
     productive: '高效',
   };
   return map[m] || m;
-}
-
-export function today(): string {
-  return new Date().toISOString().slice(0, 10);
 }
 
 export type DueStatus = 'overdue' | 'today' | 'soon' | 'later' | 'none' | 'done';

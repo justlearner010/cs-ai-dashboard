@@ -257,13 +257,13 @@ export function TodayFocus({
                 .getElementById('daily-log-form')
                 ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }}
-            className="w-full flex items-center gap-2 px-3 py-2.5 mb-3 rounded-lg bg-gradient-to-r from-red-50 to-amber-50 border border-red-200 text-left hover:from-red-100 hover:to-amber-100 transition-colors dark:from-red-950/30 dark:to-amber-950/30 dark:border-red-900/50 dark:hover:from-red-950/40 dark:hover:to-amber-950/40"
+            className="streak-at-risk w-full flex items-center gap-2 px-3 py-2.5 mb-3 rounded-lg bg-gradient-to-r from-amber-50 to-amber-100/70 border border-amber-300 text-left hover:from-amber-100 hover:to-amber-200/70 transition-colors dark:from-amber-950/40 dark:to-amber-900/30 dark:border-amber-700/60 dark:hover:from-amber-950/50 dark:hover:to-amber-900/40"
           >
-            <Flame className="w-4 h-4 text-red-500 shrink-0 animate-pulse" />
-            <span className="text-sm font-medium text-red-700 dark:text-red-300 flex-1 min-w-0">
+            <Flame className="w-4 h-4 text-amber-500 shrink-0 animate-pulse" />
+            <span className="text-sm font-medium text-amber-800 dark:text-amber-300 flex-1 min-w-0">
               已连续学习 {streak} 天 — 今天还没记录，别断了！
             </span>
-            <span className="text-xs font-medium text-red-600 dark:text-red-400 whitespace-nowrap">
+            <span className="text-xs font-medium text-amber-700 dark:text-amber-400 whitespace-nowrap">
               去记录 →
             </span>
           </motion.button>
