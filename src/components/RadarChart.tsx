@@ -46,7 +46,7 @@ export function RadarChart({ courses, highlightedDimension }: RadarChartProps) {
                     fill={isHighlighted ? '#4f46e5' : '#334155'}
                     fontSize={isHighlighted ? 13 : 11}
                     fontWeight={isHighlighted ? 700 : 600}
-                    className="transition-all duration-200"
+                    className="transition-all"
                   >
                     {payload.value}
                   </text>

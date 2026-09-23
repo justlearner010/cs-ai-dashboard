@@ -24,7 +24,7 @@ export function ScrollProgress() {
       aria-hidden
       className="fixed top-0 left-0 h-1 z-40
                  bg-gradient-to-r from-brand-400 via-brand-500 to-brand-600
-                 transition-[width] duration-150 ease-out"
+                 transition-[width]"
       style={{ width: `${pct}%` }}
     />
   );

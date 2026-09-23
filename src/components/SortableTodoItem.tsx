@@ -56,7 +56,7 @@ function SortableTodoItem({ todo, courseId, onToggle, onDelete, onSetDueDate }, 
     prevDone.current = todo.done;
     if (todo.done && !was && !reduceMotion) {
       setCelebrate(true);
-      const t = window.setTimeout(() => setCelebrate(false), 750);
+      const t = window.setTimeout(() => setCelebrate(false), MOTION.duration.burst + 100);
       return () => window.clearTimeout(t);
     }
   }, [todo.done, reduceMotion]);
@@ -88,11 +88,11 @@ function SortableTodoItem({ todo, courseId, onToggle, onDelete, onSetDueDate }, 
       transition={{ duration: MOTION.duration.base / 1000, ease: MOTION.ease.out }}
       className={`group relative p-2 rounded-lg hover:bg-white dark:hover:bg-slate-800 dark:bg-slate-800 hover:shadow-sm transition-all ${
         isDragging ? 'bg-white dark:bg-slate-800 shadow-lg ring-2 ring-brand-200' : ''
-      } ${overdue ? 'border-l-2 border-red-400 pl-1.5 shadow-sm shadow-red-100 dark:shadow-red-900/30' : ''}`}
+      } ${overdue ? 'border-l-2 border-red-400 pl-2 shadow-sm shadow-red-100 dark:shadow-red-900/30' : ''}`}
     >
       <AnimatePresence>
         {celebrate && (
-          <span aria-hidden className="pointer-events-none absolute left-5 top-2.5 z-10">
+          <span aria-hidden className="pointer-events-none absolute left-5 top-3 z-10">
             {BURST.map((p, i) => (
               <motion.span
                 key={i}
@@ -100,17 +100,17 @@ function SortableTodoItem({ todo, courseId, onToggle, onDelete, onSetDueDate }, 
                 initial={{ x: 0, y: 0, opacity: 1, scale: 1 }}
                 animate={{ x: p.x, y: p.y, opacity: 0, scale: 0.3 }}
                 exit={{ opacity: 0 }}
-                transition={{ duration: 0.65, ease: 'easeOut' }}
+                transition={{ duration: MOTION.duration.burst / 1000, ease: MOTION.ease.out }}
               />
             ))}
           </span>
         )}
       </AnimatePresence>
-      <div className="flex items-start gap-1.5">
+      <div className="flex items-start gap-2">
         <button
           {...attributes}
           {...listeners}
-          className="mt-0.5 p-0.5 text-slate-300 hover:text-slate-500 dark:text-slate-400 cursor-grab active:cursor-grabbing opacity-0 group-hover:opacity-100 transition-opacity"
+          className="mt-1 p-1 text-slate-300 hover:text-slate-500 dark:text-slate-400 cursor-grab active:cursor-grabbing opacity-0 group-hover:opacity-100 transition-opacity"
           title="拖动排序"
           aria-label="拖动排序"
         >
@@ -121,7 +121,7 @@ function SortableTodoItem({ todo, courseId, onToggle, onDelete, onSetDueDate }, 
           checked={todo.done}
           onChange={() => onToggle(courseId, todo.id)}
           aria-label={todo.text}
-          className="mt-0.5 h-4 w-4 rounded border-slate-300 dark:border-slate-600 text-brand-600 focus:ring-brand-500 cursor-pointer shrink-0"
+          className="mt-1 h-4 w-4 rounded border-slate-300 dark:border-slate-600 text-brand-600 focus:ring-brand-500 cursor-pointer shrink-0"
         />
         <span
           className={`text-sm flex-1 break-all relative ${
@@ -133,14 +133,14 @@ function SortableTodoItem({ todo, courseId, onToggle, onDelete, onSetDueDate }, 
             <motion.span
               initial={{ width: 0 }}
               animate={{ width: '100%' }}
-              transition={{ duration: 0.25, ease: 'easeOut' }}
+              transition={{ duration: MOTION.duration.slow / 1000, ease: MOTION.ease.out }}
               className="absolute left-0 top-[55%] h-[1px] bg-slate-400"
             />
           )}
         </span>
         {badge && (
           <span
-            className={`mt-0.5 px-1.5 py-0.5 rounded text-[10px] font-medium shrink-0 ${badge.className}`}
+            className={`mt-1 px-2 py-1 rounded text-[10px] font-medium shrink-0 ${badge.className}`}
           >
             {badge.label}
           </span>
@@ -165,13 +165,13 @@ function SortableTodoItem({ todo, courseId, onToggle, onDelete, onSetDueDate }, 
         </button>
       </div>
       {showDate && onSetDueDate && (
-        <div className="flex items-center gap-2 mt-1.5 pl-7">
+        <div className="flex items-center gap-2 mt-2 pl-7">
           <input
             type="date"
             value={todo.dueDate ?? ''}
             onChange={e => onSetDueDate(courseId, todo.id, e.target.value || undefined)}
             aria-label={`设置「${todo.text}」的截止日期`}
-            className="rounded-md border border-slate-300 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200 px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500"
+            className="rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200 px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500"
           />
           {todo.dueDate && (
             <button

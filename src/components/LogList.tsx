@@ -4,6 +4,7 @@ import { History, Pencil, Trash2, BookOpen, X, CheckSquare, Square } from 'lucid
 import type { Course, LogEntry } from '../types';
 import { moodLabel } from '../utils/helpers';
 import { EmptyState } from './EmptyState';
+import { MOTION } from '../motion/tokens';
 
 interface LogListProps {
   courses: Course[];
@@ -71,7 +72,7 @@ export function LogList({ courses, logs, onEdit, onDelete, onBatchDelete }: LogL
           <History className="w-5 h-5 text-brand-600" />
           <h2 className="text-lg font-semibold">学习日志</h2>
           {isBatchMode && (
-            <span className="text-xs px-2 py-0.5 rounded-full bg-brand-100 text-brand-700 dark:bg-brand-900/60 dark:text-brand-300 font-medium">
+            <span className="text-xs px-2 py-1 rounded-full bg-brand-100 text-brand-700 dark:bg-brand-900/60 dark:text-brand-300 font-medium">
               已选 {selectedIds.size}
             </span>
           )}
@@ -165,10 +166,11 @@ export function LogList({ courses, logs, onEdit, onDelete, onBatchDelete }: LogL
           />
         ) : (
           <AnimatePresence>
-            {filtered.map(log => (
+            {filtered.map((log, index) => (
               <LogItem
                 key={log.id}
                 log={log}
+                index={index}
                 isBatchMode={isBatchMode}
                 isSelected={selectedIds.has(log.id)}
                 onToggleSelect={() => toggleSelection(log.id)}
@@ -185,6 +187,7 @@ export function LogList({ courses, logs, onEdit, onDelete, onBatchDelete }: LogL
 
 interface LogItemProps {
   log: LogEntry;
+  index: number;
   isBatchMode: boolean;
   isSelected: boolean;
   onToggleSelect: () => void;
@@ -192,14 +195,25 @@ interface LogItemProps {
   onDelete: (id: string) => void;
 }
 
-function LogItem({ log, isBatchMode, isSelected, onToggleSelect, onEdit, onDelete }: LogItemProps) {
+function LogItem({ log, index, isBatchMode, isSelected, onToggleSelect, onEdit, onDelete }: LogItemProps) {
+  const enterDelay = Math.min(index, 6) * (MOTION.stagger.step / 1000);
   return (
     <motion.div
       layout
       initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, x: -24, height: 0, marginBottom: 0 }}
-      transition={{ duration: 0.2 }}
+      animate={{
+        opacity: 1,
+        y: 0,
+        transition: { duration: MOTION.duration.base / 1000, ease: MOTION.ease.out, delay: enterDelay },
+      }}
+      exit={{
+        opacity: 0,
+        x: -24,
+        height: 0,
+        marginBottom: 0,
+        transition: { duration: MOTION.duration.base / 1000, ease: MOTION.ease.out },
+      }}
+      transition={{ duration: MOTION.duration.base / 1000, ease: MOTION.ease.out }}
       className={`bg-slate-50/70 dark:bg-slate-800/70 rounded-xl border p-4 sm:p-5 transition-colors ${
         isSelected ? 'border-brand-300 bg-brand-50/50' : 'border-slate-200/80 dark:border-slate-700/80'
       }`}
@@ -219,7 +233,7 @@ function LogItem({ log, isBatchMode, isSelected, onToggleSelect, onEdit, onDelet
               className="h-4 w-4 rounded border-slate-300 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 text-brand-600 focus:ring-brand-500 cursor-pointer"
             />
           )}
-          <span className="px-2.5 py-1 bg-brand-100 text-brand-700 dark:bg-brand-900/60 dark:text-brand-300 text-xs font-semibold rounded-lg">{log.date}</span>
+          <span className="px-3 py-1 bg-brand-100 text-brand-700 dark:bg-brand-900/60 dark:text-brand-300 text-xs font-semibold rounded-lg">{log.date}</span>
           <span className="font-semibold text-sm text-slate-900 dark:text-slate-100">{log.course}</span>
           <span className="text-xs text-slate-500 dark:text-slate-400">{log.hours}h · {moodLabel(log.mood)}</span>
         </div>

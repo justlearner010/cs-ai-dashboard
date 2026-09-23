@@ -84,11 +84,11 @@ export default function TrendStats({ courses, logs }: TrendStatsProps) {
           className="flex items-center gap-4 text-xs text-slate-600 dark:text-slate-400"
           data-testid="trend-legend"
         >
-          <span className="inline-flex items-center gap-1.5" data-testid="trend-series-week">
+          <span className="inline-flex items-center gap-2" data-testid="trend-series-week">
             <span className="w-3 h-3 rounded-sm bg-brand-500/80" aria-hidden />
             每周学时（近 12 周）
           </span>
-          <span className="inline-flex items-center gap-1.5" data-testid="trend-series-cum">
+          <span className="inline-flex items-center gap-2" data-testid="trend-series-cum">
             <span className="w-4 h-0.5 rounded bg-amber-500" aria-hidden />
             累计学时
           </span>

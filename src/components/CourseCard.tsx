@@ -18,6 +18,7 @@ import {
 } from '@dnd-kit/sortable';
 import { ExternalLink, Plus, ClipboardList, CheckSquare, PlayCircle, BookOpen, Code, MessageCircle, BookText } from 'lucide-react';
 import type { Course, Todo, TodoType, ResourceType } from '../types';
+import { MOTION } from '../motion/tokens';
 import { progressColor } from '../utils/helpers';
 import { getDimensionsBySkills } from '../data/skillDimensions';
 import { EmptyState } from './EmptyState';
@@ -46,19 +47,19 @@ const resourceTypeOrder = Object.keys(resourceMeta) as ResourceType[];
 const typeConfig: Record<TodoType, { label: string; color: string; active: string; emptyTitle: string }> = {
   knowledge: {
     label: '知识点',
-    color: 'bg-blue-50 text-blue-700 border-blue-200',
+    color: 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100/70',
     active: 'bg-blue-100 text-blue-700',
     emptyTitle: '还没有知识点任务',
   },
   lab: {
     label: 'Lab',
-    color: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+    color: 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100/70',
     active: 'bg-emerald-100 text-emerald-700',
     emptyTitle: '还没有 Lab 任务',
   },
   question: {
     label: '问题',
-    color: 'bg-amber-50 text-amber-700 border-amber-200',
+    color: 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100/70',
     active: 'bg-amber-100 text-amber-700',
     emptyTitle: '还没有问题反馈',
   },
@@ -121,7 +122,7 @@ export function CourseCard({
             <div className="flex items-center gap-2 mb-1 flex-wrap">
               <span className="text-xs font-semibold text-brand-600">{course.phase}</span>
               {course.optional && (
-                <span className="px-1.5 py-0.5 text-[10px] font-medium rounded bg-amber-50 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
+                <span className="px-2 py-1 text-[10px] font-medium rounded bg-amber-50 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
                   选修
                 </span>
               )}
@@ -129,7 +130,7 @@ export function CourseCard({
                 href={course.url}
                 target="_blank"
                 rel="noreferrer"
-                className="text-xs text-slate-400 dark:text-slate-500 hover:text-brand-600 inline-flex items-center gap-0.5 transition-colors"
+                className="text-xs text-slate-400 dark:text-slate-500 hover:text-brand-600 inline-flex items-center gap-1 transition-colors"
               >
                 <ExternalLink className="w-3 h-3" /> 课程资源
               </a>
@@ -137,13 +138,13 @@ export function CourseCard({
             <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 leading-snug">
               {course.name} <span className="font-normal text-slate-500 dark:text-slate-400">— {course.fullName}</span>
             </h3>
-            <div className="flex flex-wrap gap-1.5 mt-2">
+            <div className="flex flex-wrap gap-2 mt-2">
               {getDimensionsBySkills(course.skills).map(d => (
                 <span
                   key={d.key}
                   onMouseEnter={() => onHighlightDimension?.(d.label)}
                   onMouseLeave={() => onHighlightDimension?.(null)}
-                  className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium cursor-default transition-transform hover:scale-105"
+                  className="inline-flex items-center px-2 py-1 rounded text-[10px] font-medium cursor-default transition-transform hover:scale-105"
                   style={{ color: d.color, backgroundColor: d.bgColor }}
                 >
                   {d.label}
@@ -151,7 +152,7 @@ export function CourseCard({
               ))}
             </div>
             {course.resources.length > 0 && (
-              <div className="mt-2.5 space-y-1.5">
+              <div className="mt-3 space-y-2">
                 {resourceTypeOrder
                   .map(type => ({ type, items: course.resources.filter(r => r.type === type) }))
                   .filter(group => group.items.length > 0)
@@ -189,7 +190,7 @@ export function CourseCard({
           <motion.div
             initial={{ width: 0 }}
             animate={{ width: `${pct}%` }}
-            transition={{ duration: 0.6, ease: 'easeOut' }}
+            transition={{ duration: MOTION.duration.draw / 1000, ease: MOTION.ease.out }}
             className={`h-full rounded-full ${progressColor(pct)}`}
           />
         </div>
@@ -202,7 +203,7 @@ export function CourseCard({
               <button
                 key={type}
                 onClick={() => setActiveTab(type)}
-                className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors whitespace-nowrap border ${
+                className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap border ${
                   activeTab === type ? typeConfig[type].active : typeConfig[type].color
                 }`}
               >
@@ -213,7 +214,7 @@ export function CourseCard({
           {undoneCount > 0 && (
             <button
               onClick={handleCompleteAll}
-              className="ml-2 inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg transition-colors whitespace-nowrap shrink-0"
+              className="ml-2 inline-flex items-center gap-1 px-3 py-2 text-xs font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg transition-colors whitespace-nowrap shrink-0"
               title="完成当前类型所有未完成任务"
             >
               <CheckSquare className="w-3.5 h-3.5" /> 全选
@@ -238,7 +239,7 @@ export function CourseCard({
                     initial={{ opacity: 0, scale: 0.96 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.96 }}
-                    transition={{ duration: 0.2 }}
+                    transition={{ duration: MOTION.duration.base / 1000, ease: MOTION.ease.out }}
                   >
                     <EmptyState
                       icon={ClipboardList}

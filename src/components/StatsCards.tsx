@@ -64,7 +64,7 @@ export function StatsCards({ courses, logs }: StatsCardsProps) {
             className="card p-3 sm:p-4 flex items-center gap-3 sm:gap-4"
             style={staggerStyle(index)}
           >
-            <div className={`p-2.5 sm:p-3 rounded-xl ${item.bg} shrink-0`}>
+            <div className={`p-3 sm:p-3 rounded-xl ${item.bg} shrink-0`}>
               <Icon className={`w-5 h-5 sm:w-6 sm:h-6 ${item.color}`} />
             </div>
             <div className="min-w-0">

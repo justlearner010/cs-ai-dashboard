@@ -13,6 +13,7 @@ import type { LogEntry } from '../types';
 import { Calendar, Flame, X, Clock3, CheckCircle2, PenLine, CircleHelp } from 'lucide-react';
 import { EmptyState } from './EmptyState';
 import { moodLabel } from '../utils/helpers';
+import { MOTION } from '../motion/tokens';
 
 interface HeatmapProps {
   logs: LogEntry[];
@@ -159,7 +160,7 @@ export function Heatmap({ logs, days = 365 }: HeatmapProps) {
                         title={`${cell.key} · ${cell.hours.toFixed(1)} 小时`}
                         aria-label={`${cell.key} · ${cell.hours.toFixed(1)} 小时`}
                         onClick={() => toggleSelect(cell.key)}
-                        className={`w-3 h-3 rounded-sm ${cell.levelClass} cursor-pointer transition-all duration-150 hover:ring-2 hover:ring-slate-400 hover:scale-125 ${
+                        className={`w-3 h-3 rounded-sm ${cell.levelClass} cursor-pointer transition-all hover:ring-2 hover:ring-slate-400 hover:scale-125 ${
                           isSelected ? 'ring-2 ring-brand-500 scale-125' : ''
                         }`}
                       />
@@ -187,12 +188,12 @@ export function Heatmap({ logs, days = 365 }: HeatmapProps) {
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.2 }}
+                transition={{ duration: MOTION.duration.base / 1000, ease: MOTION.ease.out }}
                 className="mt-4 rounded-xl border border-slate-200/80 dark:border-slate-700/80 bg-slate-50/70 dark:bg-slate-800/70 p-4"
               >
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="px-2.5 py-1 bg-brand-100 text-brand-700 dark:bg-brand-900/60 dark:text-brand-300 text-xs font-semibold rounded-lg">
+                    <span className="px-3 py-1 bg-brand-100 text-brand-700 dark:bg-brand-900/60 dark:text-brand-300 text-xs font-semibold rounded-lg">
                       {selectedDate}
                     </span>
                     <span className="inline-flex items-center gap-1 text-sm font-semibold text-slate-800 dark:text-slate-200">
@@ -235,7 +236,7 @@ function DayLogItem({ log }: { log: LogEntry }) {
         <span className="font-semibold text-sm text-slate-900 dark:text-slate-100">{log.course}</span>
         <span className="text-xs text-slate-500 dark:text-slate-400">{log.hours}h · {moodLabel(log.mood)}</span>
       </div>
-      <div className="space-y-1.5 text-sm">
+      <div className="space-y-2 text-sm">
         {log.knowledge && (
           <DetailRow icon={CheckCircle2} content={log.knowledge} color="text-blue-600 dark:text-blue-400" />
         )}
@@ -263,7 +264,7 @@ function DetailRow({
   color: string;
 }) {
   return (
-    <p className="flex gap-1.5 text-slate-700 dark:text-slate-300 items-start">
+    <p className="flex gap-2 text-slate-700 dark:text-slate-300 items-start">
       <Icon className={`w-3.5 h-3.5 mt-1 shrink-0 ${color}`} />
       <span className="whitespace-pre-line break-all">{content}</span>
     </p>

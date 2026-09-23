@@ -24,6 +24,10 @@ export const MOTION = {
     celebrate: 2600,
     /** count-up 数字补间 */
     countUp: 300,
+    /** SVG 路径绘制 / 进度条强调 */
+    draw: 600,
+    /** 粒子迸发退场 */
+    burst: 650,
   },
   ease: {
     /** 标准 ease-out cubic-bezier(0, 0, 0.2, 1)；framer 用四元组 */

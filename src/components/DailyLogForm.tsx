@@ -74,7 +74,7 @@ export function DailyLogForm({ courses, editingLog, onSave, onCancelEdit }: Dail
   return (
     <section className="card p-5">
       <h2 className="text-lg font-semibold flex items-center gap-2 mb-5">
-        <span className="p-1.5 rounded-lg bg-brand-100 text-brand-700 dark:bg-brand-900/60 dark:text-brand-300">
+        <span className="p-2 rounded-lg bg-brand-100 text-brand-700 dark:bg-brand-900/60 dark:text-brand-300">
           <Save className="w-4 h-4" />
         </span>
         {editingLog ? '编辑学习记录' : '每日学习记录'}
@@ -181,14 +181,14 @@ export function DailyLogForm({ courses, editingLog, onSave, onCancelEdit }: Dail
         <div className="flex gap-3">
           <button
             type="submit"
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium bg-brand-600 text-white hover:bg-brand-700 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-brand-600 text-white hover:bg-brand-700 transition-colors"
           >
             <Save className="w-4 h-4" /> {editingLog ? '更新记录' : '保存记录'}
           </button>
           <button
             type="button"
             onClick={reset}
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-800 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-800 transition-colors"
           >
             <RotateCcw className="w-4 h-4" /> 重置
           </button>

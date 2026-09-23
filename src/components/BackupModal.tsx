@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Copy, Download, FileText } from 'lucide-react';
 import type { BackupPayload } from '../utils/backup';
+import { MOTION } from '../motion/tokens';
 
 interface BackupModalProps {
   payload: BackupPayload | null;
@@ -46,7 +47,7 @@ export function BackupModal({ payload, onClose }: BackupModalProps) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
+          transition={{ duration: MOTION.duration.base / 1000, ease: MOTION.ease.out }}
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
           onClick={onClose}
         >
@@ -54,7 +55,7 @@ export function BackupModal({ payload, onClose }: BackupModalProps) {
             initial={{ opacity: 0, scale: 0.95, y: -20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: -20 }}
-            transition={{ duration: 0.25, ease: 'easeOut' }}
+            transition={{ duration: MOTION.duration.slow / 1000, ease: MOTION.ease.out }}
             onClick={e => e.stopPropagation()}
             className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-3xl max-h-[80vh] flex flex-col"
           >
@@ -106,7 +107,7 @@ export function BackupModal({ payload, onClose }: BackupModalProps) {
                   initial={{ opacity: 0, x: 8 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -8 }}
-                  transition={{ duration: 0.15 }}
+                  transition={{ duration: MOTION.duration.fast / 1000, ease: MOTION.ease.out }}
                   className="text-xs bg-slate-50 dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700 overflow-auto whitespace-pre-wrap break-all"
                 >
                   {content}
@@ -117,13 +118,13 @@ export function BackupModal({ payload, onClose }: BackupModalProps) {
             <div className="p-4 border-t border-slate-200 dark:border-slate-700 flex justify-end gap-3">
               <button
                 onClick={handleDownload}
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-800 transition-colors"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-800 transition-colors"
               >
                 <Download className="w-4 h-4" /> 下载
               </button>
               <button
                 onClick={handleCopy}
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium bg-brand-600 text-white hover:bg-brand-700 transition-colors"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-brand-600 text-white hover:bg-brand-700 transition-colors"
               >
                 <Copy className="w-4 h-4" /> {copied ? '已复制' : '复制'}
               </button>

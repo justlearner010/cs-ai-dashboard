@@ -3,6 +3,7 @@ import { BookOpen } from 'lucide-react';
 import type { Course, Todo, TodoType } from '../types';
 import { CourseCard } from './CourseCard';
 import { EmptyState } from './EmptyState';
+import { staggerStyle } from '../motion/tokens';
 
 interface CourseListProps {
   courses: Course[];
@@ -41,9 +42,9 @@ export function CourseList({
           <h2 className="text-lg font-semibold">课程与任务清单</h2>
         </div>
         <div className="flex gap-3 text-xs">
-          <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-blue-500" />知识点</span>
-          <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-emerald-500" />Lab</span>
-          <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-amber-500" />问题反馈</span>
+          <span className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-blue-500" />知识点</span>
+          <span className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-emerald-500" />Lab</span>
+          <span className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-amber-500" />问题反馈</span>
         </div>
       </div>
       <div className="flex flex-col sm:flex-row gap-2 mb-5">
@@ -82,17 +83,18 @@ export function CourseList({
         />
       ) : (
         <div className="space-y-4">
-          {visible.map(course => (
-            <CourseCard
-              key={course.id}
-              course={course}
-              onToggleTodo={onToggleTodo}
-              onAddTodo={onAddTodo}
-              onDeleteTodo={onDeleteTodo}
-              onSetDueDate={onSetDueDate}
-              onReorderTodos={onReorderTodos}
-              onHighlightDimension={onHighlightDimension}
-            />
+          {visible.map((course, index) => (
+            <div key={course.id} style={staggerStyle(index)}>
+              <CourseCard
+                course={course}
+                onToggleTodo={onToggleTodo}
+                onAddTodo={onAddTodo}
+                onDeleteTodo={onDeleteTodo}
+                onSetDueDate={onSetDueDate}
+                onReorderTodos={onReorderTodos}
+                onHighlightDimension={onHighlightDimension}
+              />
+            </div>
           ))}
         </div>
       )}

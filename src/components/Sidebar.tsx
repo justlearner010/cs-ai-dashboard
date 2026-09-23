@@ -1,12 +1,13 @@
 import { motion } from 'framer-motion';
 import { SIDEBAR_ITEMS } from '../data/navItems';
 import { useActiveSection } from '../hooks/useActiveSection';
+import { MOTION } from '../motion/tokens';
 
 function ProgressRing({ pct }: { pct: number }) {
   const r = 15;
   const c = 2 * Math.PI * r;
   return (
-    <div className="px-3 pb-2 flex items-center gap-2.5">
+    <div className="px-3 pb-2 flex items-center gap-3">
       <svg width="40" height="40" viewBox="0 0 40 40" className="shrink-0 -rotate-90" aria-hidden>
         <circle
           cx="20" cy="20" r={r} fill="none" strokeWidth="4"
@@ -18,7 +19,7 @@ function ProgressRing({ pct }: { pct: number }) {
           strokeDasharray={c}
           initial={{ strokeDashoffset: c }}
           animate={{ strokeDashoffset: c * (1 - pct / 100) }}
-          transition={{ duration: 0.6, ease: 'easeOut' }}
+          transition={{ duration: MOTION.duration.draw / 1000, ease: MOTION.ease.out }}
         />
       </svg>
       <div className="min-w-0">
@@ -45,7 +46,7 @@ export function Sidebar({ progressPct }: { progressPct: number }) {
         <p className="px-3 pb-2 text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
           页面导航
         </p>
-        <ul className="space-y-0.5">
+        <ul className="space-y-1">
           {SIDEBAR_ITEMS.map(item => {
             const Icon = item.icon;
             const active = activeId === item.id;
@@ -53,7 +54,7 @@ export function Sidebar({ progressPct }: { progressPct: number }) {
               <li key={item.id}>
                 <button
                   onClick={() => jumpTo(item.id)}
-                  className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-colors text-left
+                  className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors text-left
                     ${active
                       ? 'bg-brand-50 text-brand-700 font-medium dark:bg-brand-900/40 dark:text-brand-300'
                       : 'text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800'

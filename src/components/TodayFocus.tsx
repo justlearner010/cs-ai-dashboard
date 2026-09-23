@@ -64,25 +64,37 @@ const FocusRow = forwardRef<
   HTMLLIElement,
   {
     item: FocusItem;
+    index: number;
     onToggleTodo: (courseId: string, todoId: string) => void;
     onJumpToCourse: (courseId: string) => void;
   }
 >(function FocusRow(
-  { item, onToggleTodo, onJumpToCourse },
+  { item, index, onToggleTodo, onJumpToCourse },
   ref,
 ) {
   const badge = dueBadge(item.todo);
   const status = dueStatus(item.todo);
+  const enterDelay = Math.min(index, 6) * (MOTION.stagger.step / 1000);
   return (
     <motion.li
       ref={ref}
       layout
       initial={{ opacity: 0, y: -6 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, x: -16, height: 0, marginTop: 0 }}
+      animate={{
+        opacity: 1,
+        y: 0,
+        transition: { duration: MOTION.duration.base / 1000, ease: MOTION.ease.out, delay: enterDelay },
+      }}
+      exit={{
+        opacity: 0,
+        x: -16,
+        height: 0,
+        marginTop: 0,
+        transition: { duration: MOTION.duration.base / 1000, ease: MOTION.ease.out },
+      }}
       transition={{ duration: MOTION.duration.base / 1000, ease: MOTION.ease.out }}
       onClick={() => onJumpToCourse(item.course.id)}
-      className={`flex items-center gap-2.5 px-3 py-2 rounded-lg border-l-2 cursor-pointer transition-colors ${
+      className={`flex items-center gap-3 px-3 py-2 rounded-lg border-l-2 cursor-pointer transition-colors ${
         status === 'overdue'
           ? 'border-red-400 bg-red-50/50 hover:bg-red-50 dark:bg-red-950/20 dark:hover:bg-red-950/30'
           : status === 'today'
@@ -108,7 +120,7 @@ const FocusRow = forwardRef<
       </div>
       {badge && (
         <span
-          className={`px-1.5 py-0.5 rounded text-[10px] font-medium shrink-0 ${badge.className}`}
+          className={`px-2 py-1 rounded text-[10px] font-medium shrink-0 ${badge.className}`}
         >
           {badge.label}
         </span>
@@ -120,7 +132,7 @@ const FocusRow = forwardRef<
           e.stopPropagation();
           onJumpToCourse(item.course.id);
         }}
-        className="p-0.5 rounded shrink-0 text-slate-400 dark:text-slate-500 hover:text-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-500"
+        className="p-1 rounded shrink-0 text-slate-400 dark:text-slate-500 hover:text-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-500"
       >
         <ArrowUpRight className="w-3.5 h-3.5" />
       </button>
@@ -137,7 +149,7 @@ function ReminderButton() {
 
   if (perm === 'granted') {
     return (
-      <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-emerald-700 bg-emerald-50 rounded-lg dark:bg-emerald-900/30 dark:text-emerald-300">
+      <span className="inline-flex items-center gap-2 px-3 py-2 text-xs font-medium text-emerald-700 bg-emerald-50 rounded-lg dark:bg-emerald-900/30 dark:text-emerald-300">
         <BellRing className="w-3.5 h-3.5" /> 浏览器提醒已开启
       </span>
     );
@@ -147,7 +159,7 @@ function ReminderButton() {
     return (
       <span
         title="浏览器已拒绝通知权限，可在地址栏站点设置中重新开启"
-        className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-slate-500 bg-slate-100 rounded-lg dark:bg-slate-800 dark:text-slate-400"
+        className="inline-flex items-center gap-2 px-3 py-2 text-xs font-medium text-slate-500 bg-slate-100 rounded-lg dark:bg-slate-800 dark:text-slate-400"
       >
         <BellOff className="w-3.5 h-3.5" /> 提醒被拒绝
       </span>
@@ -160,7 +172,7 @@ function ReminderButton() {
         const res = await Notification.requestPermission();
         setPerm(res);
       }}
-      className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-brand-700 bg-brand-50 hover:bg-brand-100 rounded-lg transition-colors dark:bg-brand-900/40 dark:text-brand-300 dark:hover:bg-brand-900/60"
+      className="inline-flex items-center gap-2 px-3 py-2 text-xs font-medium text-brand-700 bg-brand-50 hover:bg-brand-100 rounded-lg transition-colors dark:bg-brand-900/40 dark:text-brand-300 dark:hover:bg-brand-900/60"
     >
       <Bell className="w-3.5 h-3.5" /> 开启浏览器提醒
     </button>
@@ -238,7 +250,7 @@ export function TodayFocus({
               window.setTimeout(() => setSyncMsg(null), 6000);
             }}
             title="导出未完成任务，用脚本批量创建为飞书待办（关掉网页手机也会提醒）"
-            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-slate-700 bg-white border border-slate-300 hover:bg-slate-50 rounded-lg transition-colors dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 dark:hover:bg-slate-700"
+            className="inline-flex items-center gap-2 px-3 py-2 text-xs font-medium text-slate-700 bg-white border border-slate-300 hover:bg-slate-50 rounded-lg transition-colors dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 dark:hover:bg-slate-700"
           >
             <Download className="w-3.5 h-3.5" /> 同步到飞书
           </button>
@@ -257,7 +269,7 @@ export function TodayFocus({
                 .getElementById('daily-log-form')
                 ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }}
-            className="streak-at-risk w-full flex items-center gap-2 px-3 py-2.5 mb-3 rounded-lg bg-gradient-to-r from-amber-50 to-amber-100/70 border border-amber-300 text-left hover:from-amber-100 hover:to-amber-200/70 transition-colors dark:from-amber-950/40 dark:to-amber-900/30 dark:border-amber-700/60 dark:hover:from-amber-950/50 dark:hover:to-amber-900/40"
+            className="streak-at-risk w-full flex items-center gap-2 px-3 py-3 mb-3 rounded-lg bg-gradient-to-r from-amber-50 to-amber-100/70 border border-amber-300 text-left hover:from-amber-100 hover:to-amber-200/70 transition-colors dark:from-amber-950/40 dark:to-amber-900/30 dark:border-amber-700/60 dark:hover:from-amber-950/50 dark:hover:to-amber-900/40"
           >
             <Flame className="w-4 h-4 text-amber-500 shrink-0 animate-pulse" />
             <span className="text-sm font-medium text-amber-800 dark:text-amber-300 flex-1 min-w-0">
@@ -272,7 +284,7 @@ export function TodayFocus({
 
       {groups.list.length === 0 ? (
         <div className="text-center py-5">
-          <p className="text-sm text-slate-600 dark:text-slate-300 flex items-center justify-center gap-1.5">
+          <p className="text-sm text-slate-600 dark:text-slate-300 flex items-center justify-center gap-2">
             <Sparkles className="w-4 h-4 text-brand-500" />
             今天没有到期任务，节奏刚刚好
           </p>
@@ -298,17 +310,18 @@ export function TodayFocus({
             return (
               <div key={group.key}>
                 <p
-                  className={`flex items-center gap-1.5 text-xs font-semibold mb-1.5 ${group.tone}`}
+                  className={`flex items-center gap-2 text-xs font-semibold mb-2 ${group.tone}`}
                 >
                   <Icon className="w-3.5 h-3.5" />
                   {group.label}（{group.items.length}）
                 </p>
-                <ul className="space-y-1.5">
+                <ul className="space-y-2">
                   <AnimatePresence initial={false} mode="popLayout">
-                    {group.items.map(item => (
+                    {group.items.map((item, index) => (
                       <FocusRow
                         key={item.todo.id}
                         item={item}
+                        index={index}
                         onToggleTodo={onToggleTodo}
                         onJumpToCourse={onJumpToCourse}
                       />
@@ -324,7 +337,7 @@ export function TodayFocus({
             </p>
           )}
           {nextStep && (
-            <p className="text-xs text-slate-500 dark:text-slate-400 pt-1 border-t border-slate-100 dark:border-slate-800 flex items-center gap-1.5">
+            <p className="text-xs text-slate-500 dark:text-slate-400 pt-1 border-t border-slate-100 dark:border-slate-800 flex items-center gap-2">
               <Sparkles className="w-3.5 h-3.5 text-brand-500 shrink-0" />
               <span className="truncate">
                 没到期的也别闲着：{nextStep.course.name} → {nextStep.todo.text}
@@ -336,7 +349,7 @@ export function TodayFocus({
       {syncMsg && (
         <p className="mt-2 text-xs text-emerald-600 dark:text-emerald-400">
           {syncMsg} — 运行{' '}
-          <code className="px-1 py-0.5 rounded bg-slate-100 dark:bg-slate-800">
+          <code className="px-1 py-1 rounded bg-slate-100 dark:bg-slate-800">
             node scripts/sync-todos-to-feishu.mjs --file feishu-todos-{today()}.json
           </code>{' '}
           创建飞书待办

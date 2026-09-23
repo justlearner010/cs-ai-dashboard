@@ -58,7 +58,7 @@ export function Header({ onExport, onImport, onBackup, lastBackupAt, isDark, onT
             }}
           />
           <div className="min-w-0">
-            <h1 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100 truncate flex items-center gap-1.5">
+            <h1 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100 truncate flex items-center gap-2">
               从零开始的Coding生活
               <span className="text-xs font-medium text-brand-600 dark:text-brand-300 whitespace-nowrap hidden md:inline">
                 ♪ MyGO Theme
@@ -86,19 +86,19 @@ export function Header({ onExport, onImport, onBackup, lastBackupAt, isDark, onT
           </button>
           <button
             onClick={onBackup}
-            className="inline-flex items-center justify-center gap-1.5 px-2.5 sm:px-3 py-2 rounded-lg text-sm font-medium bg-brand-50 text-brand-700 border border-brand-200 hover:bg-brand-100 hover:scale-105 active:scale-95 transition-all dark:bg-brand-900/40 dark:text-brand-300 dark:border-brand-800 dark:hover:bg-brand-900/60"
+            className="inline-flex items-center justify-center gap-2 px-3 sm:px-3 py-2 rounded-lg text-sm font-medium bg-brand-50 text-brand-700 border border-brand-200 hover:bg-brand-100 hover:scale-105 active:scale-95 transition-all dark:bg-brand-900/40 dark:text-brand-300 dark:border-brand-800 dark:hover:bg-brand-900/60"
           >
             <Cloud className="w-4 h-4" />
             <span className="hidden sm:inline">飞书备份</span>
           </button>
           <button
             onClick={onExport}
-            className="inline-flex items-center justify-center gap-1.5 px-2.5 sm:px-3 py-2 rounded-lg text-sm font-medium bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 hover:scale-105 active:scale-95 transition-all dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 dark:hover:bg-slate-700"
+            className="inline-flex items-center justify-center gap-2 px-3 sm:px-3 py-2 rounded-lg text-sm font-medium bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 hover:scale-105 active:scale-95 transition-all dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 dark:hover:bg-slate-700"
           >
             <Download className="w-4 h-4" />
             <span className="hidden sm:inline">导出</span>
           </button>
-          <label className="inline-flex items-center justify-center gap-1.5 px-2.5 sm:px-3 py-2 rounded-lg text-sm font-medium bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 hover:scale-105 active:scale-95 transition-all dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 dark:hover:bg-slate-700 cursor-pointer">
+          <label className="inline-flex items-center justify-center gap-2 px-3 sm:px-3 py-2 rounded-lg text-sm font-medium bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 hover:scale-105 active:scale-95 transition-all dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 dark:hover:bg-slate-700 cursor-pointer">
             <Upload className="w-4 h-4" />
             <span className="hidden sm:inline">导入</span>
             <input type="file" className="hidden" accept=".json" onChange={handleFileChange} />

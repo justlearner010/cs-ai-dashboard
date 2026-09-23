@@ -2,6 +2,7 @@ import { useMemo, useRef, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import type { Course } from '../types';
 import { MapPin } from 'lucide-react';
+import { MOTION } from '../motion/tokens';
 
 interface LearningPathProps {
   courses: Course[];
@@ -146,7 +147,7 @@ export function LearningPath({ courses, onSelectCourse }: LearningPathProps) {
               d={link.path}
               initial={{ pathLength: 0, opacity: 0 }}
               animate={{ pathLength: 1, opacity: 1 }}
-              transition={{ duration: 0.6, delay: i * 0.04 }}
+              transition={{ duration: MOTION.duration.draw / 1000, ease: MOTION.ease.out, delay: i * 0.04 }}
               fill="none"
               stroke="#cbd5e1"
               strokeWidth={1.5}
@@ -168,7 +169,7 @@ export function LearningPath({ courses, onSelectCourse }: LearningPathProps) {
               key={node.id}
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.3, delay: i * 0.05 }}
+              transition={{ duration: MOTION.duration.slow / 1000, ease: MOTION.ease.out, delay: i * 0.05 }}
               className="cursor-pointer"
               onClick={() => onSelectCourse?.(node.id)}
               opacity={optional ? 0.75 : 1}

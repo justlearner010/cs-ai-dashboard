@@ -23,6 +23,19 @@
   .dark body {
     @apply bg-[#0e0815] text-slate-200;
   }
+  /* 统一焦点环；组件自带 focus:outline-none+ring 时 utilities 层覆盖此兜底 */
+  :focus-visible {
+    outline: 2px solid #d068b8;
+    outline-offset: 2px;
+  }
+  /* 统一按压反馈；utilities 层的 active:scale-* 可覆盖 */
+  button:not(:disabled):active {
+    transform: scale(0.97);
+  }
+  button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
   h1, h2, h3 {
     @apply tracking-tight text-slate-900;
   }
