@@ -314,7 +314,15 @@ export default function App() {
       if (nowDone) {
         toast(`已完成「${label}」，今日 +${AUTO_LOG_HOURS} 学时`);
       } else if (hasTodayLog) {
-        toast(`已取消完成「${label}」，今日 −${AUTO_LOG_HOURS} 学时`);
+        // 下限 0：实际扣减可能不足 2，提示必须与落地学时一致
+        const current =
+          Number(logs.find((l) => l.date === date)?.hours) || 0;
+        const cut = Math.min(AUTO_LOG_HOURS, current);
+        toast(
+          cut > 0
+            ? `已取消完成「${label}」，今日 −${cut} 学时`
+            : `已取消完成「${label}」，今日学时已是 0`,
+        );
       } else {
         toast(`已取消完成「${label}」，今日暂无可扣回的学时`);
       }

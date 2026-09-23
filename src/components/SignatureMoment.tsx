@@ -139,13 +139,15 @@ export function SignatureMoment({
     prevAllDone.current = allDone;
   }, [allDone]);
 
-  // 里程碑：streak 处于 7/30/100 档且该档未播过
+  // 里程碑：streak 已跨过且该档未播过（>= 而非 exact——导入后首见 8 天也要补播 7 天档）
   useEffect(() => {
-    if (!MILESTONES.includes(streak)) return;
-    const key = `${STREAK_KEY}-${streak}`;
-    if (window.localStorage.getItem(key)) return;
-    window.localStorage.setItem(key, '1');
-    setQueue(q => [...q, { kind: 'streak', days: streak }]);
+    for (const m of MILESTONES) {
+      if (streak < m) continue;
+      const key = `${STREAK_KEY}-${m}`;
+      if (window.localStorage.getItem(key)) continue;
+      window.localStorage.setItem(key, '1');
+      setQueue(q => [...q, { kind: 'streak', days: m }]);
+    }
   }, [streak]);
 
   const active = queue[0];

@@ -72,13 +72,15 @@ export function today(): string {
 /**
  * 连续打卡天数（纯派生，无独立存储）。
  * 口径：按日志 date 字段、本地时区自然日；最近一天是今天或昨天为「活着」，
- * 中间断档或无日志归零，无宽限期。
+ * 中间断档或无日志归零，无宽限期；未来日期一律不计。
  */
 export function computeStreak(logs: LogEntry[]): number {
   if (logs.length === 0) return 0;
-  const dates = [...new Set(logs.map(l => l.date))].sort(
-    (a, b) => parseLocalDate(b).getTime() - parseLocalDate(a).getTime(),
-  );
+  // 未来日期不参与：否则「仅未来日志」会被 diff<=1 误判为活着并触发 at-risk 警示
+  const todayTime = parseLocalDate(today()).getTime();
+  const dates = [...new Set(logs.map(l => l.date))]
+    .filter(d => parseLocalDate(d).getTime() <= todayTime)
+    .sort((a, b) => parseLocalDate(b).getTime() - parseLocalDate(a).getTime());
   let streak = 0;
   const check = new Date();
   check.setHours(0, 0, 0, 0);
