@@ -1,10 +1,10 @@
 import type { Course } from "../types";
 
 export const defaultCourses: Omit<Course, "todos">[] = [
-  // ============ Phase 1: 编程与算法基础 ============
+  // ============ Phase 1: 编程、算法与数学基础 ============
   {
     id: "cs50",
-    phase: "① 编程与算法基础",
+    phase: "① 编程、算法与数学基础",
     name: "Harvard CS50x",
     fullName: "Introduction to Computer Science",
     url: "https://cs50.harvard.edu/x/",
@@ -21,7 +21,7 @@ export const defaultCourses: Omit<Course, "todos">[] = [
   },
   {
     id: "missing",
-    phase: "① 编程与算法基础",
+    phase: "① 编程、算法与数学基础",
     name: "MIT Missing Semester",
     fullName: "The Missing Semester of Your CS Education",
     url: "https://missing.csail.mit.edu/",
@@ -42,7 +42,7 @@ export const defaultCourses: Omit<Course, "todos">[] = [
   },
   {
     id: "mit-algo",
-    phase: "① 编程与算法基础",
+    phase: "① 编程、算法与数学基础",
     name: "MIT 6.1210 / 6.006",
     fullName: "Introduction to Algorithms",
     url: "https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-fall-2011/",
@@ -63,7 +63,7 @@ export const defaultCourses: Omit<Course, "todos">[] = [
   },
   {
     id: "mit-math",
-    phase: "① 编程与算法基础",
+    phase: "① 编程、算法与数学基础",
     name: "MIT 6.1200",
     fullName: "Mathematics for Computer Science",
     url: "https://ocw.mit.edu/courses/6-042j-mathematics-for-computer-science-spring-2015/",
@@ -84,7 +84,7 @@ export const defaultCourses: Omit<Course, "todos">[] = [
   },
   {
     id: "mit-linear",
-    phase: "① 编程与算法基础",
+    phase: "① 编程、算法与数学基础",
     name: "MIT 18.06",
     fullName: "Linear Algebra (Gilbert Strang)",
     url: "https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/",
@@ -115,7 +115,7 @@ export const defaultCourses: Omit<Course, "todos">[] = [
   },
   {
     id: "mit-probability",
-    phase: "① 编程与算法基础",
+    phase: "① 编程、算法与数学基础",
     name: "MIT 18.600",
     fullName: "Probability and Random Variables",
     url: "https://ocw.mit.edu/courses/18-600-probability-and-random-variables-fall-2019/",
@@ -248,10 +248,10 @@ export const defaultCourses: Omit<Course, "todos">[] = [
       { type: "code", title: "Lab 代码", url: "https://github.com/6.824" },
     ],
   },
-  // ============ Phase 3: 深度学习与 LLM ============
+  // ============ Phase 3: 机器学习与 LLM ============
   {
     id: "karpathy-ztp",
-    phase: "③ 深度学习与 LLM",
+    phase: "③ 机器学习与 LLM",
     name: "Zero to Hero (Karpathy)",
     fullName: "Neural Networks: Zero to Hero",
     url: "https://karpathy.ai/zero-to-hero.html",
@@ -277,7 +277,7 @@ export const defaultCourses: Omit<Course, "todos">[] = [
   },
   {
     id: "stanford-ml",
-    phase: "③ 深度学习与 LLM",
+    phase: "③ 机器学习与 LLM",
     name: "Stanford CS229",
     fullName: "Machine Learning",
     url: "https://cs229.stanford.edu/",
@@ -294,7 +294,7 @@ export const defaultCourses: Omit<Course, "todos">[] = [
   },
   {
     id: "stanford-nlp",
-    phase: "③ 深度学习与 LLM",
+    phase: "③ 机器学习与 LLM",
     name: "Stanford CS224N",
     fullName: "NLP with Deep Learning",
     url: "https://web.stanford.edu/class/cs224n/",
@@ -315,7 +315,7 @@ export const defaultCourses: Omit<Course, "todos">[] = [
   },
   {
     id: "llm-inference",
-    phase: "③ 深度学习与 LLM",
+    phase: "③ 机器学习与 LLM",
     name: "LLM Systems",
     fullName: "LLM Inference & Serving Runtime",
     url: "https://github.com/vllm-project/vllm",
@@ -336,27 +336,6 @@ export const defaultCourses: Omit<Course, "todos">[] = [
         type: "code",
         title: "llama.cpp",
         url: "https://github.com/ggml-org/llama.cpp",
-      },
-    ],
-  },
-  {
-    id: "stanford-moderndev",
-    phase: "③ 深度学习与 LLM",
-    name: "Stanford CS146S",
-    fullName: "The Modern Software Developer (Fall 2026)",
-    url: "https://themodernsoftware.dev",
-    skills: ["LLM", "Tool Orchestration", "Testing / Debugging"],
-    prerequisites: ["stanford-ml", "llm-inference"],
-    resources: [
-      {
-        type: "notes",
-        title: "课程主页",
-        url: "https://themodernsoftware.dev",
-      },
-      {
-        type: "video",
-        title: "课程介绍（Mihail Eric）",
-        url: "https://themodernsoftware.dev",
       },
     ],
   },
@@ -455,6 +434,28 @@ export const defaultCourses: Omit<Course, "todos">[] = [
         type: "notes",
         title: "LangGraph 文档（实践参考）",
         url: "https://langchain-ai.github.io/langgraph/",
+      },
+    ],
+  },
+  {
+    // 内容是 Agent 开发方法论（MCP / Agent Skills / Loop），按内容归 ④ 而非 ③
+    id: "stanford-moderndev",
+    phase: "④ Agent Runtime",
+    name: "Stanford CS146S",
+    fullName: "The Modern Software Developer (Fall 2026)",
+    url: "https://themodernsoftware.dev",
+    skills: ["LLM", "Tool Orchestration", "Testing / Debugging"],
+    prerequisites: ["stanford-ml", "llm-inference"],
+    resources: [
+      {
+        type: "notes",
+        title: "课程主页",
+        url: "https://themodernsoftware.dev",
+      },
+      {
+        type: "video",
+        title: "课程介绍（Mihail Eric）",
+        url: "https://themodernsoftware.dev",
       },
     ],
   },

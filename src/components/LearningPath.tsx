@@ -11,13 +11,14 @@ interface LearningPathProps {
 }
 
 // 路径图按列分组：⑤全栈 与 ⑥产品 在图上合并为「交付」一列（6 列在 1440 宽放不下；
-// 课程列表的阶段筛选仍按完整 phase 字符串分开）
-const pathColumns: { phases: string[]; short: string }[] = [
-  { phases: ['① 编程与算法基础'], short: '基础' },
-  { phases: ['② 系统与分布式'], short: '系统' },
-  { phases: ['③ 深度学习与 LLM'], short: 'LLM' },
-  { phases: ['④ Agent Runtime'], short: 'Agent' },
-  { phases: ['⑤ 全栈工程', '⑥ 产品与设计'], short: '交付' },
+// 课程列表的阶段筛选仍按完整 phase 字符串分开）。
+// 按圈号前缀匹配而非完整串：阶段改名后，自定义课程 / e2e fixture 携带的旧阶段名仍能归列
+const pathColumns: { nums: string[]; short: string }[] = [
+  { nums: ['①'], short: '基础' },
+  { nums: ['②'], short: '系统' },
+  { nums: ['③'], short: 'AI' },
+  { nums: ['④'], short: 'Agent' },
+  { nums: ['⑤', '⑥'], short: '交付' },
 ];
 
 const NODE_WIDTH = 164;
@@ -79,7 +80,7 @@ export function LearningPath({ courses, onSelectCourse }: LearningPathProps) {
     const svgWidth = PADDING_X * 2 + colWidth * (colCount - 1) + NODE_WIDTH;
 
     const coursesByColumn = pathColumns.map(col =>
-      courses.filter(c => col.phases.includes(c.phase))
+      courses.filter(c => col.nums.includes(c.phase.charAt(0)))
     );
 
     const maxCount = Math.max(...coursesByColumn.map(list => list.length));
