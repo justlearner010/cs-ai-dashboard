@@ -120,16 +120,24 @@ export function moodLabel(m: string): string {
 
 export type DueStatus = 'overdue' | 'today' | 'soon' | 'later' | 'none' | 'done';
 
-/** 任务截止状态：逾期 / 今天到期 / 3天内 / 更晚 / 未设置 / 已完成 */
-export function dueStatus(todo: Todo): DueStatus {
-  if (todo.done) return 'done';
-  if (!todo.dueDate) return 'none';
+/** 截止日所处时间窗（不看完成状态；「今日焦点」聚合与通关判定共用此口径） */
+export function dueWindow(todo: Todo): 'overdue' | 'today' | 'soon' | null {
+  if (!todo.dueDate) return null;
   const t = today();
   if (todo.dueDate < t) return 'overdue';
   if (todo.dueDate === t) return 'today';
-  const diff =
-    (new Date(todo.dueDate).getTime() - new Date(t).getTime()) / (1000 * 60 * 60 * 24);
-  return diff <= 3 ? 'soon' : 'later';
+  const diff = Math.round(
+    (parseLocalDate(todo.dueDate).getTime() - parseLocalDate(t).getTime()) / (1000 * 60 * 60 * 24),
+  );
+  return diff <= 3 ? 'soon' : null;
+}
+
+/** 任务截止状态：逾期 / 今天到期 / 3天内 / 更晚 / 未设置 / 已完成 */
+export function dueStatus(todo: Todo): DueStatus {
+  if (todo.done) return 'done';
+  const window = dueWindow(todo);
+  if (window) return window;
+  return todo.dueDate ? 'later' : 'none';
 }
 
 export function isOverdue(todo: Todo): boolean {

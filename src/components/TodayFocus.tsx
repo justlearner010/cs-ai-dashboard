@@ -13,7 +13,7 @@ import {
   Download,
 } from 'lucide-react';
 import type { Course, LogEntry, Todo } from '../types';
-import { computeStreak, dueBadge, dueStatus, today } from '../utils/helpers';
+import { computeStreak, dueBadge, dueStatus, dueWindow, today } from '../utils/helpers';
 import { reminderSupported } from '../hooks/useTaskReminders';
 import { downloadFeishuSync } from '../utils/feishuSync';
 import { MOTION } from '../motion/tokens';
@@ -40,8 +40,8 @@ function collectDueItems(courses: Course[]): FocusItem[] {
   const items: FocusItem[] = [];
   for (const course of courses) {
     for (const todo of course.todos) {
-      const status = dueStatus(todo);
-      if (status === 'overdue' || status === 'today' || status === 'soon') {
+      // 时间窗口径（含已完成）：点亮后仍留在列表里，「全部点亮」才可见
+      if (dueWindow(todo)) {
         items.push({ todo, course });
       }
     }
@@ -192,9 +192,9 @@ export function TodayFocus({
 
   const groups = useMemo(() => {
     const items = collectDueItems(courses);
-    const overdue = items.filter(i => dueStatus(i.todo) === 'overdue');
-    const dueToday = items.filter(i => dueStatus(i.todo) === 'today');
-    const soonAll = items.filter(i => dueStatus(i.todo) === 'soon');
+    const overdue = items.filter(i => dueWindow(i.todo) === 'overdue');
+    const dueToday = items.filter(i => dueWindow(i.todo) === 'today');
+    const soonAll = items.filter(i => dueWindow(i.todo) === 'soon');
     const soon = soonAll.slice(0, 4);
     return {
       list: [

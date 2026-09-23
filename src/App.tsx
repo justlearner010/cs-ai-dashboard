@@ -10,6 +10,7 @@ import { DailyLogForm } from "./components/DailyLogForm";
 import { LogList } from "./components/LogList";
 import { Sidebar } from "./components/Sidebar";
 import { BackToTop } from "./components/BackToTop";
+import { SignatureMoment } from "./components/SignatureMoment";
 import { MobileNav } from "./components/MobileNav";
 import { ScrollProgress } from "./components/ScrollProgress";
 import { TodayFocus } from "./components/TodayFocus";
@@ -640,6 +641,7 @@ export default function App() {
 
       <MobileNav />
       <BackToTop />
+      <SignatureMoment courses={courses} logs={logs} />
 
       <Suspense fallback={null}>
         <BackupModal
