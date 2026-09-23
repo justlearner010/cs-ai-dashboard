@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
+    "e2e": "node scripts/e2e-cdp.mjs",
     "deploy": "bash scripts/deploy.sh"
   },
   "dependencies": {
