@@ -37,6 +37,8 @@ export const MOTION = {
   spring: {
     /** 庆祝 / 签名时刻的弹簧曲线 */
     celebrate: { type: 'spring' as const, stiffness: 260, damping: 18 },
+    /** 导航活动指示器（layoutId）的弹簧曲线 */
+    nav: { type: 'spring' as const, stiffness: 380, damping: 32 },
   },
   stagger: {
     /** 错峰进场步长（ms / item） */

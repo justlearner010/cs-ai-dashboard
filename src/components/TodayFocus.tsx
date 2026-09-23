@@ -13,10 +13,11 @@ import {
   Download,
 } from 'lucide-react';
 import type { Course, LogEntry, Todo } from '../types';
-import { computeStreak, dueBadge, dueStatus, dueWindow, today } from '../utils/helpers';
+import { computeStreak, dueBadge, dueStatus, dueWindow, today, smoothScrollTo } from '../utils/helpers';
 import { reminderSupported } from '../hooks/useTaskReminders';
 import { downloadFeishuSync } from '../utils/feishuSync';
 import { MOTION } from '../motion/tokens';
+import { SectionHeader } from './SectionHeader';
 
 interface FocusItem {
   todo: Todo;
@@ -111,8 +112,22 @@ const FocusRow = forwardRef<
         className="h-4 w-4 rounded border-slate-300 dark:border-slate-600 text-brand-600 focus:ring-brand-500 cursor-pointer shrink-0"
       />
       <div className="min-w-0 flex-1">
-        <p className="text-sm text-slate-800 dark:text-slate-200 truncate">
+        <p
+          className={`text-sm truncate relative ${
+            item.todo.done
+              ? 'text-slate-400 dark:text-slate-500'
+              : 'text-slate-800 dark:text-slate-200'
+          }`}
+        >
           {item.todo.text}
+          {item.todo.done && (
+            <motion.span
+              initial={{ width: 0 }}
+              animate={{ width: '100%' }}
+              transition={{ duration: MOTION.duration.slow / 1000, ease: MOTION.ease.out }}
+              className="absolute left-0 top-[55%] h-[1px] bg-slate-400"
+            />
+          )}
         </p>
         <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
           {item.course.name} · {typeLabels[item.todo.type]}
@@ -132,7 +147,7 @@ const FocusRow = forwardRef<
           e.stopPropagation();
           onJumpToCourse(item.course.id);
         }}
-        className="p-1 rounded shrink-0 text-slate-400 dark:text-slate-500 hover:text-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-500"
+        className="btn btn--icon !p-1 text-slate-400 dark:text-slate-500 hover:text-brand-600 shrink-0"
       >
         <ArrowUpRight className="w-3.5 h-3.5" />
       </button>
@@ -149,7 +164,7 @@ function ReminderButton() {
 
   if (perm === 'granted') {
     return (
-      <span className="inline-flex items-center gap-2 px-3 py-2 text-xs font-medium text-emerald-700 bg-emerald-50 rounded-lg dark:bg-emerald-900/30 dark:text-emerald-300">
+      <span className="pill bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 px-3 py-1.5">
         <BellRing className="w-3.5 h-3.5" /> 浏览器提醒已开启
       </span>
     );
@@ -159,7 +174,7 @@ function ReminderButton() {
     return (
       <span
         title="浏览器已拒绝通知权限，可在地址栏站点设置中重新开启"
-        className="inline-flex items-center gap-2 px-3 py-2 text-xs font-medium text-slate-500 bg-slate-100 rounded-lg dark:bg-slate-800 dark:text-slate-400"
+        className="pill bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400 px-3 py-1.5"
       >
         <BellOff className="w-3.5 h-3.5" /> 提醒被拒绝
       </span>
@@ -172,7 +187,7 @@ function ReminderButton() {
         const res = await Notification.requestPermission();
         setPerm(res);
       }}
-      className="inline-flex items-center gap-2 px-3 py-2 text-xs font-medium text-brand-700 bg-brand-50 hover:bg-brand-100 rounded-lg transition-colors dark:bg-brand-900/40 dark:text-brand-300 dark:hover:bg-brand-900/60"
+      className="btn btn--quiet text-xs px-3 py-2"
     >
       <Bell className="w-3.5 h-3.5" /> 开启浏览器提醒
     </button>
@@ -233,29 +248,27 @@ export function TodayFocus({
 
   return (
     <div className="card p-4 sm:p-5">
-      <div className="flex items-center justify-between gap-2 mb-3 flex-wrap">
-        <div className="flex items-center gap-2 min-w-0">
-          <Target className="w-5 h-5 text-brand-600 shrink-0" />
-          <h2 className="text-lg font-semibold">今日焦点</h2>
-          <span className="text-xs text-slate-400 dark:text-slate-500 whitespace-nowrap">
-            {dateLabel}
-          </span>
-        </div>
-        <div className="flex items-center gap-2 flex-wrap">
-          <ReminderButton />
-          <button
-            onClick={() => {
-              const n = downloadFeishuSync(courses);
-              setSyncMsg(`已导出 ${n} 项未完成任务`);
-              window.setTimeout(() => setSyncMsg(null), 6000);
-            }}
-            title="导出未完成任务，用脚本批量创建为飞书待办（关掉网页手机也会提醒）"
-            className="inline-flex items-center gap-2 px-3 py-2 text-xs font-medium text-slate-700 bg-white border border-slate-300 hover:bg-slate-50 rounded-lg transition-colors dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 dark:hover:bg-slate-700"
-          >
-            <Download className="w-3.5 h-3.5" /> 同步到飞书
-          </button>
-        </div>
-      </div>
+      <SectionHeader
+        icon={Target}
+        title="今日焦点"
+        muted={<span className="text-xs text-slate-600 dark:text-slate-400 whitespace-nowrap">{dateLabel}</span>}
+        extra={
+          <div className="flex items-center gap-2 flex-wrap">
+            <ReminderButton />
+            <button
+              onClick={() => {
+                const n = downloadFeishuSync(courses);
+                setSyncMsg(`已导出 ${n} 项未完成任务`);
+                window.setTimeout(() => setSyncMsg(null), 6000);
+              }}
+              title="导出未完成任务，用脚本批量创建为飞书待办（关掉网页手机也会提醒）"
+              className="btn btn--quiet text-xs px-3 py-2"
+            >
+              <Download className="w-3.5 h-3.5" /> 同步到飞书
+            </button>
+          </div>
+        }
+      />
 
       <AnimatePresence>
         {showStreakWarning && (
@@ -265,13 +278,11 @@ export function TodayFocus({
             exit={{ opacity: 0, y: -8, height: 0 }}
             transition={{ duration: MOTION.duration.base / 1000, ease: MOTION.ease.out }}
             onClick={() => {
-              document
-                .getElementById('daily-log-form')
-                ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              smoothScrollTo('daily-log-form', { block: 'start' });
             }}
-            className="streak-at-risk w-full flex items-center gap-2 px-3 py-3 mb-3 rounded-lg bg-gradient-to-r from-amber-50 to-amber-100/70 border border-amber-300 text-left hover:from-amber-100 hover:to-amber-200/70 transition-colors dark:from-amber-950/40 dark:to-amber-900/30 dark:border-amber-700/60 dark:hover:from-amber-950/50 dark:hover:to-amber-900/40"
+            className="w-full flex items-center gap-2 px-3 py-3 mb-3 rounded-lg bg-gradient-to-r from-amber-50 to-amber-100/70 border border-amber-300 text-left hover:from-amber-100 hover:to-amber-200/70 transition-colors dark:from-amber-950/40 dark:to-amber-900/30 dark:border-amber-700/60 dark:hover:from-amber-950/50 dark:hover:to-amber-900/40"
           >
-            <Flame className="w-4 h-4 text-amber-500 shrink-0 animate-pulse" />
+            <Flame className="w-4 h-4 text-amber-500 shrink-0" />
             <span className="text-sm font-medium text-amber-800 dark:text-amber-300 flex-1 min-w-0">
               已连续学习 {streak} 天 — 今天还没记录，别断了！
             </span>
@@ -291,7 +302,7 @@ export function TodayFocus({
           {nextStep && (
             <button
               onClick={() => onJumpToCourse(nextStep.course.id)}
-              className="mt-3 inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-brand-50 hover:bg-brand-100 text-sm text-brand-700 transition-colors dark:bg-brand-900/30 dark:text-brand-300 dark:hover:bg-brand-900/50 max-w-full"
+              className="btn btn--accent mt-3 text-xs px-3 py-2 max-w-full"
             >
               <span className="truncate">
                 下一步建议：{nextStep.course.name} → {nextStep.todo.text}

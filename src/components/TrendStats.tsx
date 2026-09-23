@@ -13,6 +13,8 @@ import { Calendar, TrendingUp, Award, Clock3, Flame } from 'lucide-react';
 import { getDimensionsBySkills } from '../data/skillDimensions';
 import { computeStreak, totalHours } from '../utils/helpers';
 import { format, startOfWeek, endOfWeek, addWeeks } from 'date-fns';
+import { SectionHeader } from './SectionHeader';
+import { EmptyState } from './EmptyState';
 
 interface TrendStatsProps {
   courses: Course[];
@@ -75,33 +77,33 @@ export default function TrendStats({ courses, logs }: TrendStatsProps) {
 
   return (
     <section className="card p-4 sm:p-5" data-testid="trend-section">
-      <div className="flex items-center justify-between gap-3 mb-4 flex-wrap">
-        <div className="flex items-center gap-2">
-          <TrendingUp className="w-5 h-5 text-brand-600" />
-          <h2 className="text-lg font-semibold">学习趋势</h2>
-        </div>
-        <div
-          className="flex items-center gap-4 text-xs text-slate-600 dark:text-slate-400"
-          data-testid="trend-legend"
-        >
-          <span className="inline-flex items-center gap-2" data-testid="trend-series-week">
-            <span className="w-3 h-3 rounded-sm bg-brand-500/80" aria-hidden />
-            每周学时（近 12 周）
-          </span>
-          <span className="inline-flex items-center gap-2" data-testid="trend-series-cum">
-            <span className="w-4 h-0.5 rounded bg-amber-500" aria-hidden />
-            累计学时
-          </span>
-        </div>
-      </div>
+      <SectionHeader
+        icon={TrendingUp}
+        title="学习趋势"
+        extra={
+          <div
+            className="flex items-center gap-4 text-xs text-slate-600 dark:text-slate-400"
+            data-testid="trend-legend"
+          >
+            <span className="inline-flex items-center gap-2" data-testid="trend-series-week">
+              <span className="w-3 h-3 rounded-sm bg-brand-600/75" aria-hidden />
+              每周学时（近 12 周）
+            </span>
+            <span className="inline-flex items-center gap-2" data-testid="trend-series-cum">
+              <span className="w-4 h-0.5 rounded bg-amber-500" aria-hidden />
+              累计学时
+            </span>
+          </div>
+        }
+      />
 
       {!hasData ? (
-        <div
-          className="text-center text-slate-400 dark:text-slate-500 py-10 text-sm"
-          data-testid="trend-empty"
-        >
-          <TrendingUp className="w-8 h-8 mx-auto mb-2 opacity-40" aria-hidden />
-          还没有学习日志——记录第一条后，这里会长出你的成长曲线。
+        <div data-testid="trend-empty">
+          <EmptyState
+            icon={TrendingUp}
+            title="还没有学习日志"
+            description="记录第一条后，这里会长出你的成长曲线。"
+          />
         </div>
       ) : (
         <>
@@ -150,17 +152,17 @@ export default function TrendStats({ courses, logs }: TrendStatsProps) {
 
           {/* 月度小结 */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-5 pt-4 border-t border-slate-200/80 dark:border-slate-700/80">
-            <MiniStat icon={Clock3} label="本月时长" value={`${summary.monthHours}h`} color="text-blue-600" bg="bg-blue-50" />
-            <MiniStat icon={Calendar} label="本月学习天数" value={`${summary.monthDays} 天`} color="text-emerald-600" bg="bg-emerald-50" />
+            <MiniStat icon={Clock3} label="本月时长" value={`${summary.monthHours}h`} color="text-blue-600 dark:text-blue-400" bg="bg-blue-50 dark:bg-blue-950/50" />
+            <MiniStat icon={Calendar} label="本月学习天数" value={`${summary.monthDays} 天`} color="text-emerald-600 dark:text-emerald-400" bg="bg-emerald-50 dark:bg-emerald-950/50" />
             <MiniStat
               icon={Award}
               label="本月最活跃"
               value={summary.topDim ? `${summary.topDim[0]}` : '—'}
               sub={summary.topDim ? `${summary.topDim[1]}h` : undefined}
-              color="text-purple-600"
-              bg="bg-purple-50"
+              color="text-purple-600 dark:text-purple-400"
+              bg="bg-purple-50 dark:bg-purple-950/50"
             />
-            <MiniStat icon={Flame} label="连续打卡" value={`${summary.streak} 天`} color="text-amber-600" bg="bg-amber-50" />
+            <MiniStat icon={Flame} label="连续打卡" value={`${summary.streak} 天`} color="text-amber-600 dark:text-amber-400" bg="bg-amber-50 dark:bg-amber-950/50" />
           </div>
         </>
       )}

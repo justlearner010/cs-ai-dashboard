@@ -3,6 +3,7 @@ import { BookOpen } from 'lucide-react';
 import type { Course, Todo, TodoType } from '../types';
 import { CourseCard } from './CourseCard';
 import { EmptyState } from './EmptyState';
+import { SectionHeader } from './SectionHeader';
 import { staggerStyle } from '../motion/tokens';
 
 interface CourseListProps {
@@ -35,18 +36,18 @@ export function CourseList({
   });
 
   return (
-    <section className="card p-5">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
-        <div className="flex items-center gap-2">
-          <BookOpen className="w-5 h-5 text-brand-600" />
-          <h2 className="text-lg font-semibold">课程与任务清单</h2>
-        </div>
-        <div className="flex gap-3 text-xs">
-          <span className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-blue-500" />知识点</span>
-          <span className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-emerald-500" />Lab</span>
-          <span className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-amber-500" />问题反馈</span>
-        </div>
-      </div>
+    <section className="card p-4 sm:p-5">
+      <SectionHeader
+        icon={BookOpen}
+        title="课程与任务清单"
+        extra={
+          <div className="flex gap-3 text-xs">
+            <span className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-blue-500" />知识点</span>
+            <span className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-emerald-500" />Lab</span>
+            <span className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-amber-500" />问题反馈</span>
+          </div>
+        }
+      />
       <div className="flex flex-col sm:flex-row gap-2 mb-5">
         <input
           type="search"
@@ -54,13 +55,13 @@ export function CourseList({
           onChange={e => setQuery(e.target.value)}
           placeholder="搜索课程 / 技能…"
           aria-label="搜索课程"
-          className="rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 w-full sm:w-auto sm:min-w-[12rem]"
+          className="input w-full sm:w-auto sm:min-w-[12rem]"
         />
         <select
           value={phase}
           onChange={e => setPhase(e.target.value)}
           aria-label="按阶段筛选课程"
-          className="rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 w-full sm:w-auto"
+          className="input w-full sm:w-auto"
         >
           <option value="">全部阶段</option>
           {phases.map(p => (

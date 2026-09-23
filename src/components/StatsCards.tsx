@@ -25,32 +25,32 @@ export function StatsCards({ courses, logs }: StatsCardsProps) {
       label: '总完成度',
       value: `${animatedPct}%`,
       raw: `${pct}%`,
-      color: 'text-brand-700 dark:text-brand-300',
-      bg: 'bg-brand-100 dark:bg-brand-900/40',
+      color: 'text-slate-600 dark:text-slate-300',
+      bg: 'glass-subtle',
     },
     {
       icon: CheckCircle2,
       label: '已完成项',
       value: `${animatedDone}/${total}`,
       raw: `${done}/${total}`,
-      color: 'text-brand-600 dark:text-brand-300',
-      bg: 'bg-brand-50 dark:bg-brand-900/30',
+      color: 'text-slate-600 dark:text-slate-300',
+      bg: 'glass-subtle',
     },
     {
       icon: Flame,
       label: '连续打卡',
       value: `${animatedStreak} 天`,
       raw: `${streak} 天`,
-      color: 'text-brand-800 dark:text-brand-300',
-      bg: 'bg-brand-200/70 dark:bg-brand-900/50',
+      color: 'text-brand-700 dark:text-brand-300',
+      bg: 'bg-brand-100/80 dark:bg-brand-900/40',
     },
     {
       icon: Clock,
       label: '总学习时长',
       value: `${animatedHours.toFixed(1)}h`,
       raw: `${hours.toFixed(1)}h`,
-      color: 'text-brand-700 dark:text-brand-300',
-      bg: 'bg-brand-100/80 dark:bg-brand-900/40',
+      color: 'text-slate-600 dark:text-slate-300',
+      bg: 'glass-subtle',
     },
   ];
 
@@ -68,7 +68,7 @@ export function StatsCards({ courses, logs }: StatsCardsProps) {
               <Icon className={`w-5 h-5 sm:w-6 sm:h-6 ${item.color}`} />
             </div>
             <div className="min-w-0">
-              <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">{item.label}</p>
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">{item.label}</p>
               <p className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-slate-100 tabular-nums">
                 {item.value}
               </p>

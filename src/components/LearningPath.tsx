@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import type { Course } from '../types';
 import { MapPin } from 'lucide-react';
 import { MOTION } from '../motion/tokens';
+import { SectionHeader } from './SectionHeader';
 
 interface LearningPathProps {
   courses: Course[];
@@ -119,11 +120,11 @@ export function LearningPath({ courses, onSelectCourse }: LearningPathProps) {
 
   return (
     <section className="card p-4 sm:p-5">
-      <div className="flex items-center gap-2 mb-4 flex-wrap">
-        <MapPin className="w-5 h-5 text-brand-600" />
-        <h2 className="text-lg font-semibold">学习路径图</h2>
-        <span className="text-xs text-slate-400 dark:text-slate-500 ml-auto">共 {courses.length} 门课程</span>
-      </div>
+      <SectionHeader
+        icon={MapPin}
+        title="学习路径图"
+        muted={<span className="text-xs text-slate-600 dark:text-slate-400">共 {courses.length} 门课程</span>}
+      />
 
       <div ref={containerRef} className="overflow-x-auto pb-2">
         <svg width={svgWidth} height={svgHeight} className="min-w-full">
@@ -147,7 +148,7 @@ export function LearningPath({ courses, onSelectCourse }: LearningPathProps) {
               d={link.path}
               initial={{ pathLength: 0, opacity: 0 }}
               animate={{ pathLength: 1, opacity: 1 }}
-              transition={{ duration: MOTION.duration.draw / 1000, ease: MOTION.ease.out, delay: i * 0.04 }}
+              transition={{ duration: MOTION.duration.draw / 1000, ease: MOTION.ease.out, delay: (i * MOTION.stagger.step) / 1000 }}
               fill="none"
               stroke="#cbd5e1"
               strokeWidth={1.5}
@@ -169,7 +170,7 @@ export function LearningPath({ courses, onSelectCourse }: LearningPathProps) {
               key={node.id}
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: MOTION.duration.slow / 1000, ease: MOTION.ease.out, delay: i * 0.05 }}
+              transition={{ duration: MOTION.duration.slow / 1000, ease: MOTION.ease.out, delay: (i * MOTION.stagger.step) / 1000 }}
               className="cursor-pointer"
               onClick={() => onSelectCourse?.(node.id)}
               opacity={optional ? 0.75 : 1}

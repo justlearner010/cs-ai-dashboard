@@ -20,17 +20,17 @@ export function BackupModal({ payload, onClose }: BackupModalProps) {
     }
   }, [payload]);
 
-  if (!payload) return null;
-
-  const content = activeTab === 'markdown' ? payload.markdown : payload.xml;
+  const content = activeTab === 'markdown' ? payload?.markdown : payload?.xml;
 
   const handleCopy = async () => {
+    if (!content) return;
     await navigator.clipboard.writeText(content);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
   const handleDownload = () => {
+    if (!content || !payload) return;
     const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -40,6 +40,7 @@ export function BackupModal({ payload, onClose }: BackupModalProps) {
     URL.revokeObjectURL(url);
   };
 
+  // AnimatePresence 常驻：payload 归 null 时播放退出动画后再卸载
   return (
     <AnimatePresence>
       {payload && (
@@ -57,28 +58,29 @@ export function BackupModal({ payload, onClose }: BackupModalProps) {
             exit={{ opacity: 0, scale: 0.95, y: -20 }}
             transition={{ duration: MOTION.duration.slow / 1000, ease: MOTION.ease.out }}
             onClick={e => e.stopPropagation()}
-            className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-3xl max-h-[80vh] flex flex-col"
+            className="glass-strong rounded-2xl w-full max-w-3xl max-h-[80vh] flex flex-col"
           >
-            <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-700">
+            <div className="flex items-center justify-between p-4 border-b border-white/50 dark:border-slate-700/60">
               <div className="flex items-center gap-2">
                 <FileText className="w-5 h-5 text-brand-600" />
                 <h3 className="text-lg font-semibold">飞书文档备份内容</h3>
               </div>
               <button
                 onClick={onClose}
-                className="text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:text-slate-400 p-1 rounded-lg hover:bg-slate-100 dark:bg-slate-700 transition-colors"
+                aria-label="关闭"
+                className="btn btn--quiet btn--icon"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="p-4 border-b border-slate-200 dark:border-slate-700">
+            <div className="p-4 border-b border-white/50 dark:border-slate-700/60">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div className="flex rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden">
+                <div className="flex rounded-lg border border-white/50 dark:border-slate-700 overflow-hidden glass-subtle">
                   <button
                     onClick={() => setActiveTab('markdown')}
                     className={`px-4 py-2 text-sm font-medium transition-colors ${
-                      activeTab === 'markdown' ? 'bg-brand-50 text-brand-700 dark:bg-brand-900/60 dark:text-brand-300' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700'
+                      activeTab === 'markdown' ? 'bg-brand-50 text-brand-700 dark:bg-brand-900/60 dark:text-brand-300' : 'text-slate-600 dark:text-slate-400 hover:bg-white/70 dark:hover:bg-slate-700'
                     }`}
                   >
                     Markdown
@@ -86,13 +88,13 @@ export function BackupModal({ payload, onClose }: BackupModalProps) {
                   <button
                     onClick={() => setActiveTab('xml')}
                     className={`px-4 py-2 text-sm font-medium transition-colors ${
-                      activeTab === 'xml' ? 'bg-brand-50 text-brand-700 dark:bg-brand-900/60 dark:text-brand-300' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700'
+                      activeTab === 'xml' ? 'bg-brand-50 text-brand-700 dark:bg-brand-900/60 dark:text-brand-300' : 'text-slate-600 dark:text-slate-400 hover:bg-white/70 dark:hover:bg-slate-700'
                     }`}
                   >
                     飞书 XML
                   </button>
                 </div>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
+                <p className="text-xs text-slate-600 dark:text-slate-400">
                   {activeTab === 'markdown'
                     ? '可复制到飞书文档「导入 Markdown」'
                     : '可配合 scripts/backup-to-feishu.mjs 自动创建文档'}
@@ -108,23 +110,23 @@ export function BackupModal({ payload, onClose }: BackupModalProps) {
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -8 }}
                   transition={{ duration: MOTION.duration.fast / 1000, ease: MOTION.ease.out }}
-                  className="text-xs bg-slate-50 dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700 overflow-auto whitespace-pre-wrap break-all"
+                  className="text-xs glass-subtle rounded-xl p-4 overflow-auto whitespace-pre-wrap break-all"
                 >
                   {content}
                 </motion.pre>
               </AnimatePresence>
             </div>
 
-            <div className="p-4 border-t border-slate-200 dark:border-slate-700 flex justify-end gap-3">
+            <div className="p-4 border-t border-white/50 dark:border-slate-700/60 flex justify-end gap-3">
               <button
                 onClick={handleDownload}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-800 transition-colors"
+                className="btn btn--quiet px-4"
               >
                 <Download className="w-4 h-4" /> 下载
               </button>
               <button
                 onClick={handleCopy}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-brand-600 text-white hover:bg-brand-700 transition-colors"
+                className="btn btn--solid px-4"
               >
                 <Copy className="w-4 h-4" /> {copied ? '已复制' : '复制'}
               </button>

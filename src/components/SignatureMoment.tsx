@@ -82,7 +82,7 @@ function MomentOverlay({
               style={{ marginLeft: -5, marginTop: -5 }}
               initial={{ x: 0, y: 0, opacity: 1, scale: 1 }}
               animate={{ x: p.x, y: p.y, opacity: 0, scale: 0.3 }}
-              transition={{ ...MOTION.spring.celebrate, delay: (i % 5) * 0.04 }}
+              transition={{ ...MOTION.spring.celebrate, delay: ((i % 5) * MOTION.stagger.step) / 1000 }}
             />
           ))}
         </span>
@@ -97,7 +97,7 @@ function MomentOverlay({
             : MOTION.spring.celebrate
         }
         data-static={reduceMotion ? '' : undefined}
-        className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-200/80 dark:border-slate-700 px-8 py-6 text-center"
+        className="glass-strong rounded-2xl px-8 py-6 text-center"
       >
         <div className="text-4xl mb-2" aria-hidden>
           {isClear ? '🎉' : '🔥'}
