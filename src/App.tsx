@@ -19,7 +19,7 @@ import { ThemeBackground, MyGoHero } from "./components/ThemeBackground";
 import { Reveal } from "./components/Reveal";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { LazySectionFallback } from "./components/LazyLoad";
-import { today, overallProgress } from "./utils/helpers";
+import { today, uuid, overallProgress } from "./utils/helpers";
 import { generateBackupContent, type BackupPayload } from "./utils/backup";
 
 // 重型组件按需加载，减小首屏 bundle
@@ -46,6 +46,8 @@ const LOGS_KEY = "csAiAgentLogsV3";
 const LEGACY_COURSES_KEY = "csAiAgentCoursesV2";
 const LEGACY_LOGS_KEY = "csAiAgentLogs";
 const LAST_BACKUP_KEY = "csAiAgentLastBackupAt";
+/** 任务完成自动记时的固定学时（spec：固定 2 小时，不做配置项） */
+const AUTO_LOG_HOURS = 2;
 
 // 解析失败过的 key：挂载合并时跳过写回，避免用 fallback 覆盖损坏原文
 const corruptKeys = new Set<string>();
@@ -247,19 +249,77 @@ export default function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleToggleTodo = useCallback((courseId: string, todoId: string) => {
-    setCourses((prev) =>
-      prev.map((c) => {
-        if (c.id !== courseId) return c;
-        return {
-          ...c,
-          todos: c.todos.map((t) =>
-            t.id === todoId ? { ...t, done: !t.done } : t,
+  const handleToggleTodo = useCallback(
+    (courseId: string, todoId: string) => {
+      const course = courses.find((c) => c.id === courseId);
+      const todo = course?.todos.find((t) => t.id === todoId);
+      if (!course || !todo) return;
+      const nowDone = !todo.done;
+
+      setCourses((prev) =>
+        prev.map((c) => {
+          if (c.id !== courseId) return c;
+          return {
+            ...c,
+            todos: c.todos.map((t) =>
+              t.id === todoId ? { ...t, done: nowDone } : t,
+            ),
+          };
+        }),
+      );
+
+      // 今日日志联动：完成 +2h（无日志自动创建），取消 −2h（下限 0）
+      const date = today();
+      const hasTodayLog = logs.some((l) => l.date === date);
+      setLogs((prev) => {
+        const idx = prev.findIndex((l) => l.date === date);
+        if (nowDone) {
+          if (idx === -1) {
+            const created: LogEntry = {
+              id: uuid(),
+              date,
+              course: `${course.phase} — ${course.name}`,
+              hours: AUTO_LOG_HOURS,
+              mood: "productive",
+              knowledge: `任务完成自动记时：${todo.text}`,
+              lab: "",
+              questions: "",
+              reflection: "",
+              createdAt: new Date().toISOString(),
+            };
+            return [...prev, created];
+          }
+          const next = [...prev];
+          next[idx] = {
+            ...next[idx],
+            hours: (Number(next[idx].hours) || 0) + AUTO_LOG_HOURS,
+          };
+          return next;
+        }
+        if (idx === -1) return prev;
+        const next = [...prev];
+        next[idx] = {
+          ...next[idx],
+          hours: Math.max(
+            0,
+            (Number(next[idx].hours) || 0) - AUTO_LOG_HOURS,
           ),
         };
-      }),
-    );
-  }, []);
+        return next;
+      });
+
+      const label =
+        todo.text.length > 16 ? `${todo.text.slice(0, 16)}…` : todo.text;
+      if (nowDone) {
+        toast(`已完成「${label}」，今日 +${AUTO_LOG_HOURS} 学时`);
+      } else if (hasTodayLog) {
+        toast(`已取消完成「${label}」，今日 −${AUTO_LOG_HOURS} 学时`);
+      } else {
+        toast(`已取消完成「${label}」，今日暂无可扣回的学时`);
+      }
+    },
+    [courses, logs, setCourses, setLogs, toast],
+  );
 
   const handleAddTodo = useCallback(
     (courseId: string, text: string, type: TodoType, dueDate?: string) => {
