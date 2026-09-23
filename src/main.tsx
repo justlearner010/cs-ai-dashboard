@@ -1,5 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import { MotionConfig } from 'framer-motion'
 import App from './App.tsx'
 import { ToastProvider } from './hooks/useToast'
 import './index.css'
@@ -72,8 +73,10 @@ importFromHash()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <ToastProvider>
-      <App />
-    </ToastProvider>
+    <MotionConfig reducedMotion="user">
+      <ToastProvider>
+        <App />
+      </ToastProvider>
+    </MotionConfig>
   </StrictMode>,
 )

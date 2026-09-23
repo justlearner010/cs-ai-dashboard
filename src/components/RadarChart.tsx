@@ -28,7 +28,7 @@ export function RadarChart({ courses, highlightedDimension }: RadarChartProps) {
         </div>
         <span className="text-xs text-slate-500 dark:text-slate-400">基于各能力维度完成度实时生成</span>
       </div>
-      <div className="w-full h-64 sm:h-80 lg:h-96">
+      <div className="w-full h-[280px] sm:h-80 lg:h-96">
         <ResponsiveContainer width="100%" height="100%">
           <ReRadarChart data={data} margin={{ top: 16, right: 32, bottom: 16, left: 32 }}>
             <PolarGrid stroke="#e2e8f0" />

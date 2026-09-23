@@ -131,7 +131,7 @@ export function DailyLogForm({ courses, editingLog, onSave, onCancelEdit }: Dail
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           <div>
             <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">📚 知识点（学了什么）</label>
             <textarea

@@ -33,13 +33,15 @@ interface CourseCardProps {
   onHighlightDimension?: (dimension: string | null) => void;
 }
 
-const resourceIcons: Record<ResourceType, typeof PlayCircle> = {
-  video: PlayCircle,
-  notes: BookOpen,
-  code: Code,
-  community: MessageCircle,
-  book: BookText,
+// 单一数据源：类型完整性由 Record<ResourceType, …> 强制，分组顺序 = 声明顺序
+const resourceMeta: Record<ResourceType, { label: string; Icon: typeof PlayCircle }> = {
+  video: { label: '视频', Icon: PlayCircle },
+  notes: { label: '笔记', Icon: BookOpen },
+  code: { label: '代码', Icon: Code },
+  community: { label: '社区', Icon: MessageCircle },
+  book: { label: '书单', Icon: BookText },
 };
+const resourceTypeOrder = Object.keys(resourceMeta) as ResourceType[];
 
 const typeConfig: Record<TodoType, { label: string; color: string; active: string; emptyTitle: string }> = {
   knowledge: {
@@ -149,27 +151,37 @@ export function CourseCard({
               ))}
             </div>
             {course.resources.length > 0 && (
-              <div className="flex flex-wrap gap-3 mt-2.5">
-                {course.resources.map((res, i) => {
-                  const Icon = resourceIcons[res.type];
-                  return (
-                    <a
-                      key={i}
-                      href={res.url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400 hover:text-brand-600 transition-colors"
-                    >
-                      <Icon className="w-3.5 h-3.5" />
-                      {res.title}
-                    </a>
-                  );
-                })}
+              <div className="mt-2.5 space-y-1.5">
+                {resourceTypeOrder
+                  .map(type => ({ type, items: course.resources.filter(r => r.type === type) }))
+                  .filter(group => group.items.length > 0)
+                  .map(({ type, items }) => {
+                    const { label, Icon } = resourceMeta[type];
+                    return (
+                      <div key={type} className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                        <span className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 shrink-0">
+                          {label}
+                        </span>
+                        {items.map((res, i) => (
+                          <a
+                            key={i}
+                            href={res.url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400 hover:text-brand-600 transition-colors"
+                          >
+                            <Icon className="w-3.5 h-3.5" />
+                            {res.title}
+                          </a>
+                        ))}
+                      </div>
+                    );
+                  })}
               </div>
             )}
           </div>
           <div className="text-left sm:text-right shrink-0">
-            <div className="text-2xl font-bold text-slate-900 dark:text-slate-100 tabular-nums">{pct}%</div>
+            <div className="text-2xl font-bold text-slate-900 dark:text-slate-100 tabular-nums whitespace-nowrap">{pct}%</div>
             <div className="text-xs text-slate-500 dark:text-slate-400">{done}/{total}</div>
           </div>
         </div>

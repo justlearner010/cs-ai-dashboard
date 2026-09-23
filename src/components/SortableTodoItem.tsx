@@ -75,10 +75,16 @@ function SortableTodoItem({ todo, courseId, onToggle, onDelete, onSetDueDate }, 
       ref={setRefs}
       style={style}
       layout
-      initial={{ opacity: 0, x: -12 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: -24, height: 0, marginBottom: 0 }}
-      transition={{ duration: 0.25, ease: 'easeOut' }}
+      initial={{ opacity: 0, y: -8 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{
+        opacity: 0,
+        x: -24,
+        height: 0,
+        marginBottom: 0,
+        transition: { duration: 0.25, ease: 'easeOut' },
+      }}
+      transition={{ duration: 0.2, ease: 'easeOut' }}
       className={`group relative p-2 rounded-lg hover:bg-white dark:hover:bg-slate-800 dark:bg-slate-800 hover:shadow-sm transition-all ${
         isDragging ? 'bg-white dark:bg-slate-800 shadow-lg ring-2 ring-brand-200' : ''
       } ${overdue ? 'border-l-2 border-red-400 pl-1.5 shadow-sm shadow-red-100 dark:shadow-red-900/30' : ''}`}

@@ -53,6 +53,7 @@ export function LogList({ courses, logs, onEdit, onDelete, onBatchDelete }: LogL
 
   const handleBatchDelete = () => {
     if (selectedIds.size === 0) return;
+    if (!window.confirm(`确定删除 ${selectedIds.size} 条日志？`)) return;
     onBatchDelete(Array.from(selectedIds));
     setSelectedIds(new Set());
     setIsBatchMode(false);

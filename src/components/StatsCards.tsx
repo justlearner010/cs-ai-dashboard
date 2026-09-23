@@ -13,10 +13,11 @@ export function StatsCards({ courses, logs }: StatsCardsProps) {
   const streak = computeStreak(logs);
   const hours = totalHours(logs);
 
-  const animatedPct = useAnimatedNumber(pct, { decimals: 0 });
-  const animatedDone = useAnimatedNumber(done, { decimals: 0 });
-  const animatedStreak = useAnimatedNumber(streak, { decimals: 0 });
-  const animatedHours = useAnimatedNumber(hours, { decimals: 1 });
+  const anim = { duration: 300 };
+  const animatedPct = useAnimatedNumber(pct, { ...anim, decimals: 0 });
+  const animatedDone = useAnimatedNumber(done, { ...anim, decimals: 0 });
+  const animatedStreak = useAnimatedNumber(streak, { ...anim, decimals: 0 });
+  const animatedHours = useAnimatedNumber(hours, { ...anim, decimals: 1 });
 
   const items = [
     {

@@ -9,6 +9,12 @@ export function useAnimatedNumber(
   const startRef = useRef({ from: target, to: target, startAt: 0 });
 
   useEffect(() => {
+    // 尊重系统「减少动态效果」：直接落到目标值，不播放补间
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setValue(target);
+      return;
+    }
+
     const from = value;
     const to = target;
     startRef.current = { from, to, startAt: performance.now() };
