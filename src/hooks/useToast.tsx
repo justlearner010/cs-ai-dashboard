@@ -8,6 +8,7 @@ import {
   type ReactNode,
 } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
+import { MOTION } from '../motion/tokens';
 
 interface ToastAction {
   label: string;
@@ -70,7 +71,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               initial={{ opacity: 0, y: -8, scale: 0.97 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -6, scale: 0.97 }}
-              transition={{ duration: 0.2 }}
+              transition={{ duration: MOTION.duration.base / 1000, ease: MOTION.ease.out }}
               className="flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg border text-sm backdrop-blur
                          bg-white/95 text-slate-700 border-slate-200
                          dark:bg-slate-800/95 dark:text-slate-200 dark:border-slate-700"

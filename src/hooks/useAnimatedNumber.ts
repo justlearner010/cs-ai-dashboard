@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
+import { MOTION } from '../motion/tokens';
 
 export function useAnimatedNumber(
   target: number,
   options: { duration?: number; decimals?: number } = {}
 ): number {
-  const { duration = 600, decimals = 0 } = options;
+  const { duration = MOTION.duration.countUp, decimals = 0 } = options;
   const [value, setValue] = useState(target);
   const startRef = useRef({ from: target, to: target, startAt: 0 });
 

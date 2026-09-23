@@ -16,6 +16,7 @@ import type { Course, LogEntry, Todo } from '../types';
 import { computeStreak, dueBadge, dueStatus, today } from '../utils/helpers';
 import { reminderSupported } from '../hooks/useTaskReminders';
 import { downloadFeishuSync } from '../utils/feishuSync';
+import { MOTION } from '../motion/tokens';
 
 interface FocusItem {
   todo: Todo;
@@ -79,7 +80,7 @@ const FocusRow = forwardRef<
       initial={{ opacity: 0, y: -6 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, x: -16, height: 0, marginTop: 0 }}
-      transition={{ duration: 0.22, ease: 'easeOut' }}
+      transition={{ duration: MOTION.duration.base / 1000, ease: MOTION.ease.out }}
       onClick={() => onJumpToCourse(item.course.id)}
       className={`flex items-center gap-2.5 px-3 py-2 rounded-lg border-l-2 cursor-pointer transition-colors ${
         status === 'overdue'
@@ -250,7 +251,7 @@ export function TodayFocus({
             initial={{ opacity: 0, y: -8, height: 0 }}
             animate={{ opacity: 1, y: 0, height: 'auto' }}
             exit={{ opacity: 0, y: -8, height: 0 }}
-            transition={{ duration: 0.25 }}
+            transition={{ duration: MOTION.duration.base / 1000, ease: MOTION.ease.out }}
             onClick={() => {
               document
                 .getElementById('daily-log-form')

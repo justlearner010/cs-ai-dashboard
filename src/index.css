@@ -2,12 +2,23 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  /* T1 动效 token 的 CSS 侧兜底，运行时由 applyMotionCssVars() 覆盖为 tokens.ts 的值 */
+  --motion-fast: 150ms;
+  --motion-base: 200ms;
+  --motion-slow: 300ms;
+  --motion-reveal: 450ms;
+  --motion-ease: cubic-bezier(0, 0, 0.2, 1);
+}
+
 @layer base {
   html {
     @apply antialiased;
   }
   body {
-    @apply bg-[#fdf5fa] text-slate-800 font-sans transition-colors duration-300;
+    @apply bg-[#fdf5fa] text-slate-800 font-sans transition-colors;
+    transition-duration: var(--motion-slow);
+    transition-timing-function: var(--motion-ease);
   }
   .dark body {
     @apply bg-[#0e0815] text-slate-200;
@@ -96,8 +107,8 @@
   50% { transform: scale(1.035); }
 }
 
-/* 统计卡片入场（index * 80ms 错峰） */
-@keyframes stats-enter {
+/* 错峰进场原语（staggerStyle() 消费；index * 80ms 步长来自 MOTION.stagger.step） */
+@keyframes stagger-enter {
   from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: translateY(0); }
 }

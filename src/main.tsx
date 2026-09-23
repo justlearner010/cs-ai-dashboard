@@ -3,7 +3,10 @@ import { createRoot } from 'react-dom/client'
 import { MotionConfig } from 'framer-motion'
 import App from './App.tsx'
 import { ToastProvider } from './hooks/useToast'
+import { applyMotionCssVars } from './motion/tokens'
 import './index.css'
+
+applyMotionCssVars()
 
 const COURSES_KEY = 'csAiAgentCoursesV3'
 const LOGS_KEY = 'csAiAgentLogsV3'

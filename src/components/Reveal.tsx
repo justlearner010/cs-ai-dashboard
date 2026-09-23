@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { MOTION } from '../motion/tokens';
 
 interface RevealProps {
   children: ReactNode;
@@ -38,7 +39,7 @@ export function Reveal({ children, delay = 0, className }: RevealProps) {
       style={{
         opacity: shown ? 1 : 0,
         transform: shown ? 'none' : 'translateY(24px)',
-        transition: `opacity 0.45s ease-out ${delay}s, transform 0.45s ease-out ${delay}s`,
+        transition: `opacity ${MOTION.duration.reveal}ms ${MOTION.ease.cssOut} ${delay}s, transform ${MOTION.duration.reveal}ms ${MOTION.ease.cssOut} ${delay}s`,
       }}
     >
       {children}

@@ -2,6 +2,7 @@ import { Percent, CheckCircle2, Flame, Clock } from 'lucide-react';
 import type { Course, LogEntry } from '../types';
 import { overallProgress, computeStreak, totalHours } from '../utils/helpers';
 import { useAnimatedNumber } from '../hooks/useAnimatedNumber';
+import { staggerStyle } from '../motion/tokens';
 
 interface StatsCardsProps {
   courses: Course[];
@@ -13,11 +14,10 @@ export function StatsCards({ courses, logs }: StatsCardsProps) {
   const streak = computeStreak(logs);
   const hours = totalHours(logs);
 
-  const anim = { duration: 300 };
-  const animatedPct = useAnimatedNumber(pct, { ...anim, decimals: 0 });
-  const animatedDone = useAnimatedNumber(done, { ...anim, decimals: 0 });
-  const animatedStreak = useAnimatedNumber(streak, { ...anim, decimals: 0 });
-  const animatedHours = useAnimatedNumber(hours, { ...anim, decimals: 1 });
+  const animatedPct = useAnimatedNumber(pct);
+  const animatedDone = useAnimatedNumber(done);
+  const animatedStreak = useAnimatedNumber(streak);
+  const animatedHours = useAnimatedNumber(hours, { decimals: 1 });
 
   const items = [
     {
@@ -62,10 +62,7 @@ export function StatsCards({ courses, logs }: StatsCardsProps) {
           <div
             key={index}
             className="card p-3 sm:p-4 flex items-center gap-3 sm:gap-4"
-            style={{
-              animation: 'stats-enter 0.4s ease-out both',
-              animationDelay: `${index * 80}ms`,
-            }}
+            style={staggerStyle(index)}
           >
             <div className={`p-2.5 sm:p-3 rounded-xl ${item.bg} shrink-0`}>
               <Icon className={`w-5 h-5 sm:w-6 sm:h-6 ${item.color}`} />

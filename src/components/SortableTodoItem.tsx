@@ -5,6 +5,7 @@ import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Trash2, GripVertical, CalendarDays } from 'lucide-react';
 import type { Todo } from '../types';
 import { dueBadge, dueStatus } from '../utils/helpers';
+import { MOTION } from '../motion/tokens';
 
 /** 完成庆祝粒子的散开方向与颜色 */
 const BURST = [
@@ -82,9 +83,9 @@ function SortableTodoItem({ todo, courseId, onToggle, onDelete, onSetDueDate }, 
         x: -24,
         height: 0,
         marginBottom: 0,
-        transition: { duration: 0.25, ease: 'easeOut' },
+        transition: { duration: MOTION.duration.base / 1000, ease: MOTION.ease.out },
       }}
-      transition={{ duration: 0.2, ease: 'easeOut' }}
+      transition={{ duration: MOTION.duration.base / 1000, ease: MOTION.ease.out }}
       className={`group relative p-2 rounded-lg hover:bg-white dark:hover:bg-slate-800 dark:bg-slate-800 hover:shadow-sm transition-all ${
         isDragging ? 'bg-white dark:bg-slate-800 shadow-lg ring-2 ring-brand-200' : ''
       } ${overdue ? 'border-l-2 border-red-400 pl-1.5 shadow-sm shadow-red-100 dark:shadow-red-900/30' : ''}`}
