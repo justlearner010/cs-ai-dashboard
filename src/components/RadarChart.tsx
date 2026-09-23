@@ -10,6 +10,7 @@ import {
 import { Radar } from 'lucide-react';
 import type { Course } from '../types';
 import { computeSkillRadarData } from '../utils/helpers';
+import { SectionHeader } from './SectionHeader';
 
 interface RadarChartProps {
   courses: Course[];
@@ -21,13 +22,11 @@ export function RadarChart({ courses, highlightedDimension }: RadarChartProps) {
 
   return (
     <section className="card p-4 sm:p-5">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
-        <div className="flex items-center gap-2">
-          <Radar className="w-5 h-5 text-brand-600" />
-          <h2 className="text-lg font-semibold">能力雷达图</h2>
-        </div>
-        <span className="text-xs text-slate-500 dark:text-slate-400">基于各能力维度完成度实时生成</span>
-      </div>
+      <SectionHeader
+        icon={Radar}
+        title="能力雷达图"
+        muted={<span className="text-xs text-slate-600 dark:text-slate-400">基于各能力维度完成度实时生成</span>}
+      />
       <div className="w-full h-[280px] sm:h-80 lg:h-96">
         <ResponsiveContainer width="100%" height="100%">
           <ReRadarChart data={data} margin={{ top: 16, right: 32, bottom: 16, left: 32 }}>
@@ -43,7 +42,7 @@ export function RadarChart({ courses, highlightedDimension }: RadarChartProps) {
                     y={y}
                     textAnchor="middle"
                     dominantBaseline="central"
-                    fill={isHighlighted ? '#4f46e5' : '#334155'}
+                    fill={isHighlighted ? '#c253a4' : '#334155'}
                     fontSize={isHighlighted ? 13 : 11}
                     fontWeight={isHighlighted ? 700 : 600}
                     className="transition-all"
@@ -67,9 +66,9 @@ export function RadarChart({ courses, highlightedDimension }: RadarChartProps) {
             <ReRadar
               name="能力掌握度"
               dataKey="value"
-              stroke="#4f46e5"
+              stroke="#d068b8"
               strokeWidth={2}
-              fill="#4f46e5"
+              fill="#d068b8"
               fillOpacity={highlightedDimension ? 0.12 : 0.2}
             />
           </ReRadarChart>

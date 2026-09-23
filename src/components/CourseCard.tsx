@@ -44,23 +44,23 @@ const resourceMeta: Record<ResourceType, { label: string; Icon: typeof PlayCircl
 };
 const resourceTypeOrder = Object.keys(resourceMeta) as ResourceType[];
 
-const typeConfig: Record<TodoType, { label: string; color: string; active: string; emptyTitle: string }> = {
+const typeConfig: Record<TodoType, { label: string; color: string; activeText: string; emptyTitle: string }> = {
   knowledge: {
     label: '知识点',
-    color: 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100/70',
-    active: 'bg-blue-100 text-blue-700',
+    color: 'bg-blue-50/70 text-blue-700 border-blue-200/60 hover:bg-blue-100/70 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-800/40 dark:hover:bg-blue-950/60',
+    activeText: 'text-blue-700 dark:text-blue-300',
     emptyTitle: '还没有知识点任务',
   },
   lab: {
     label: 'Lab',
-    color: 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100/70',
-    active: 'bg-emerald-100 text-emerald-700',
+    color: 'bg-emerald-50/70 text-emerald-700 border-emerald-200/60 hover:bg-emerald-100/70 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800/40 dark:hover:bg-emerald-950/60',
+    activeText: 'text-emerald-700 dark:text-emerald-300',
     emptyTitle: '还没有 Lab 任务',
   },
   question: {
     label: '问题',
-    color: 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100/70',
-    active: 'bg-amber-100 text-amber-700',
+    color: 'bg-amber-50/70 text-amber-700 border-amber-200/60 hover:bg-amber-100/70 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800/40 dark:hover:bg-amber-950/60',
+    activeText: 'text-amber-700 dark:text-amber-300',
     emptyTitle: '还没有问题反馈',
   },
 };
@@ -115,14 +115,14 @@ export function CourseCard({
   };
 
   return (
-    <div id={`course-${course.id}`} className="bg-slate-50/70 dark:bg-slate-800/70 rounded-xl border border-slate-200/80 dark:border-slate-700/80 overflow-hidden scroll-mt-24">
-      <div className="p-4 sm:p-5 border-b border-slate-200/80 dark:border-slate-700/80 bg-white dark:bg-slate-800">
+    <div id={`course-${course.id}`} className="glass-subtle rounded-xl overflow-hidden scroll-mt-24">
+      <div className="p-4 sm:p-5 border-b border-white/60 dark:border-slate-700/60">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
           <div className="min-w-0">
             <div className="flex items-center gap-2 mb-1 flex-wrap">
-              <span className="text-xs font-semibold text-brand-600">{course.phase}</span>
+              <span className="text-xs font-semibold text-brand-600 dark:text-brand-400">{course.phase}</span>
               {course.optional && (
-                <span className="px-2 py-1 text-[10px] font-medium rounded bg-amber-50 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
+                <span className="pill bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
                   选修
                 </span>
               )}
@@ -197,24 +197,35 @@ export function CourseCard({
       </div>
 
       <div className="p-4 sm:p-5">
-        <div className="flex items-center justify-between mb-4 border-b border-slate-200/80 dark:border-slate-700/80 pb-2">
+        <div className="flex items-center justify-between mb-4 border-b border-white/60 dark:border-slate-700/60 pb-2">
           <div className="flex gap-2 overflow-x-auto">
             {(Object.keys(typeConfig) as TodoType[]).map(type => (
               <button
                 key={type}
                 onClick={() => setActiveTab(type)}
-                className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap border ${
-                  activeTab === type ? typeConfig[type].active : typeConfig[type].color
+                aria-current={activeTab === type}
+                className={`relative px-3 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap border border-transparent ${
+                  activeTab === type ? typeConfig[type].activeText : typeConfig[type].color
                 }`}
               >
-                {typeConfig[type].label} ({course.todos.filter(t => t.type === type).length})
+                {activeTab === type && (
+                  <motion.span
+                    layoutId={`course-tab-${course.id}`}
+                    transition={MOTION.spring.nav}
+                    className="absolute inset-0 rounded-lg bg-white dark:bg-slate-700/80 border border-white/70 dark:border-slate-600 shadow-sm"
+                    aria-hidden
+                  />
+                )}
+                <span className="relative">
+                  {typeConfig[type].label} ({course.todos.filter(t => t.type === type).length})
+                </span>
               </button>
             ))}
           </div>
           {undoneCount > 0 && (
             <button
               onClick={handleCompleteAll}
-              className="ml-2 inline-flex items-center gap-1 px-3 py-2 text-xs font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg transition-colors whitespace-nowrap shrink-0"
+              className="btn btn--quiet ml-2 text-xs px-3 py-2 whitespace-nowrap shrink-0"
               title="完成当前类型所有未完成任务"
             >
               <CheckSquare className="w-3.5 h-3.5" /> 全选
@@ -271,18 +282,18 @@ export function CourseCard({
             onChange={e => setNewTodo(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && handleAdd()}
             placeholder="添加新任务..."
-            className="flex-1 min-w-[180px] rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
+            className="input flex-1 min-w-[180px]"
           />
           <input
             type="date"
             value={newDueDate}
             onChange={e => setNewDueDate(e.target.value)}
             title="截止日期（可选）"
-            className="w-36 rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
+            className="input w-36"
           />
           <button
             onClick={handleAdd}
-            className="inline-flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium bg-brand-600 text-white hover:bg-brand-700 transition-colors whitespace-nowrap"
+            className="btn btn--solid px-3 py-2 whitespace-nowrap"
           >
             <Plus className="w-4 h-4" /> 添加
           </button>

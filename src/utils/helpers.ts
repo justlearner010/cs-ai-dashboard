@@ -120,6 +120,28 @@ export function moodLabel(m: string): string {
   return map[m] || m;
 }
 
+/**
+ * 尊重 prefers-reduced-motion 的滚动封装：
+ * 传元素/元素 id 走 scrollIntoView，传数字走 window.scrollTo；
+ * 系统要求减少动效时降为瞬时跳转（auto）。
+ */
+export function smoothScrollTo(
+  target: Element | string | number,
+  opts: ScrollIntoViewOptions = {},
+): void {
+  const behavior: ScrollBehavior =
+    typeof window !== 'undefined' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      ? 'auto'
+      : 'smooth';
+  if (typeof target === 'number') {
+    window.scrollTo({ top: target, behavior });
+    return;
+  }
+  const el = typeof target === 'string' ? document.getElementById(target) : target;
+  el?.scrollIntoView({ block: 'start', ...opts, behavior });
+}
+
 export type DueStatus = 'overdue' | 'today' | 'soon' | 'later' | 'none' | 'done';
 
 /** 截止日所处时间窗（不看完成状态；「今日焦点」聚合与通关判定共用此口径） */

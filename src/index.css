@@ -16,12 +16,12 @@
     @apply antialiased;
   }
   body {
-    @apply bg-[#fdf5fa] text-slate-800 font-sans transition-colors;
+    @apply bg-[#f5f6f8] text-slate-800 font-sans transition-colors;
     transition-duration: var(--motion-slow);
     transition-timing-function: var(--motion-ease);
   }
   .dark body {
-    @apply bg-[#0e0815] text-slate-200;
+    @apply bg-[#0e1016] text-slate-200;
   }
   /* 统一焦点环；组件自带 focus:outline-none+ring 时 utilities 层覆盖此兜底 */
   :focus-visible {
@@ -53,11 +53,140 @@
 }
 
 @layer components {
+  /* ——— 玻璃三阶 ———
+     性能预算：同屏 backdrop-filter ≤ 12 层（首屏约 8 层）。
+     blur 只给结构性表面（chrome / 顶层卡片 / sidebar / hero 框）；
+     卡内嵌套面板、按钮、徽章一律半透明填充 + 边框，不开 blur。
+     掉帧时先将 StatsCards 四块降为 .glass-subtle。 */
+
+  /* L3 强玻璃：sticky chrome（Header / MobileNav / Toast / BackupModal） */
+  .glass-strong {
+    background: rgba(255, 255, 255, 0.72);
+    -webkit-backdrop-filter: blur(28px) saturate(180%);
+    backdrop-filter: blur(28px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.65);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.85),
+      0 1px 2px rgba(15, 23, 42, 0.04),
+      0 12px 32px -12px rgba(15, 23, 42, 0.14);
+  }
+  .dark .glass-strong {
+    background: rgba(13, 17, 23, 0.68);
+    border-color: rgba(148, 163, 184, 0.14);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.06),
+      0 12px 32px -12px rgba(0, 0, 0, 0.55);
+  }
+
+  /* L2 主玻璃：顶层卡片（类名 .card 保持不变） */
   .card {
-    @apply bg-white rounded-xl border border-slate-200/80 shadow-sm transition-colors;
+    background: rgba(255, 255, 255, 0.58);
+    -webkit-backdrop-filter: blur(20px) saturate(150%);
+    backdrop-filter: blur(20px) saturate(150%);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 0.75rem;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.7),
+      0 1px 2px rgba(15, 23, 42, 0.03),
+      0 8px 24px -8px rgba(15, 23, 42, 0.08);
+    transition:
+      background-color var(--motion-base) var(--motion-ease),
+      border-color var(--motion-base) var(--motion-ease),
+      box-shadow var(--motion-base) var(--motion-ease);
   }
   .dark .card {
-    @apply bg-slate-900 border-slate-800;
+    background: rgba(14, 17, 24, 0.6);
+    border-color: rgba(148, 163, 184, 0.12);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.05),
+      0 8px 24px -8px rgba(0, 0, 0, 0.5);
+  }
+
+  /* L1 弱玻璃：卡内嵌套面板、空态 —— 无 blur */
+  .glass-subtle {
+    background: rgba(255, 255, 255, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  }
+  .dark .glass-subtle {
+    background: rgba(30, 41, 59, 0.45);
+    border-color: rgba(148, 163, 184, 0.1);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  }
+
+  /* ——— 控件原语 ——— */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg text-sm font-medium transition-all duration-150 select-none;
+  }
+  .btn:active:not(:disabled) {
+    transform: scale(0.96);
+  }
+  .btn--quiet {
+    background: rgba(255, 255, 255, 0.55);
+    color: #334155;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  }
+  .btn--quiet:hover {
+    background: rgba(255, 255, 255, 0.85);
+  }
+  .dark .btn--quiet {
+    background: rgba(30, 41, 59, 0.55);
+    color: #cbd5e1;
+    border-color: rgba(148, 163, 184, 0.15);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  }
+  .dark .btn--quiet:hover {
+    background: rgba(30, 41, 59, 0.85);
+  }
+  .btn--accent {
+    color: #a8478d;
+    background: rgba(208, 104, 184, 0.12);
+    border: 1px solid rgba(208, 104, 184, 0.35);
+  }
+  .btn--accent:hover {
+    background: rgba(208, 104, 184, 0.2);
+  }
+  .dark .btn--accent {
+    color: #f0b3e0;
+    background: rgba(208, 104, 184, 0.15);
+    border-color: rgba(208, 104, 184, 0.4);
+  }
+  .dark .btn--accent:hover {
+    background: rgba(208, 104, 184, 0.25);
+  }
+  .btn--solid {
+    @apply bg-brand-600 text-white;
+  }
+  .btn--solid:hover {
+    @apply bg-brand-700;
+  }
+  .btn--icon {
+    @apply p-2;
+  }
+
+  .input {
+    @apply w-full rounded-lg border px-3 py-2 text-sm transition-colors;
+    background: rgba(255, 255, 255, 0.55);
+    border-color: rgba(15, 23, 42, 0.12);
+    color: inherit;
+  }
+  .input:focus {
+    outline: none;
+    border-color: #d068b8;
+    box-shadow: 0 0 0 3px rgba(208, 104, 184, 0.25);
+  }
+  .dark .input {
+    background: rgba(30, 41, 59, 0.5);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #e2e8f0;
+  }
+
+  .pill {
+    @apply inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium whitespace-nowrap;
+  }
+  .label-muted {
+    @apply text-xs font-medium text-slate-400 dark:text-slate-500;
   }
   .no-scrollbar {
     scrollbar-width: none;
@@ -67,15 +196,20 @@
   }
 }
 
-/* Recharts tooltip customization */
+/* Recharts tooltip customization（浮层允许 blur） */
 .recharts-tooltip-wrapper {
   outline: none !important;
 }
 .recharts-default-tooltip {
-  @apply rounded-lg border border-slate-200 bg-white/95 shadow-lg !important;
+  background: rgba(255, 255, 255, 0.8) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(150%) !important;
+  backdrop-filter: blur(16px) saturate(150%) !important;
+  border-color: rgba(255, 255, 255, 0.6) !important;
+  @apply rounded-lg shadow-lg !important;
 }
 .dark .recharts-default-tooltip {
-  @apply border-slate-700 bg-slate-900/95 !important;
+  background: rgba(14, 17, 24, 0.8) !important;
+  border-color: rgba(148, 163, 184, 0.15) !important;
 }
 .recharts-tooltip-label {
   @apply text-slate-900 font-medium !important;
@@ -98,26 +232,13 @@
 }
 
 /* ——— 动效 keyframes ——— */
-@keyframes float-y {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-14px); }
+/* 首屏唯一编排入场（App 外壳，播一次） */
+@keyframes load-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
 }
-.animate-float-slow {
-  animation: float-y 7s ease-in-out infinite;
-}
-
-@keyframes hero-shimmer {
-  0% { transform: translateX(0) skewX(-12deg); }
-  60%, 100% { transform: translateX(500%) skewX(-12deg); }
-}
-.hero-shimmer {
-  animation: hero-shimmer 5.5s ease-in-out infinite;
-}
-
-/* Hero 横幅呼吸缩放（替代 framer 循环动画） */
-@keyframes hero-breathe {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.035); }
+.animate-load-in {
+  animation: load-in 350ms var(--motion-ease) both;
 }
 
 /* 错峰进场原语（staggerStyle() 消费；index * 80ms 步长来自 MOTION.stagger.step） */
@@ -148,4 +269,10 @@
 }
 .dark svg polygon[fill="#cbd5e1"] {
   fill: #475569;
+}
+.dark svg rect[fill="#fdf6ee"] {
+  fill: #1e2532;
+}
+.dark svg rect[stroke="#d6a2a2"] {
+  stroke: #7a4a4a;
 }

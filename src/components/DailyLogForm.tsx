@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Save, RotateCcw } from 'lucide-react';
 import type { Course, LogEntry, Mood } from '../types';
 import { uuid, today, moodLabel } from '../utils/helpers';
+import { SectionHeader } from './SectionHeader';
 
 interface DailyLogFormProps {
   courses: Course[];
@@ -72,13 +73,8 @@ export function DailyLogForm({ courses, editingLog, onSave, onCancelEdit }: Dail
   };
 
   return (
-    <section className="card p-5">
-      <h2 className="text-lg font-semibold flex items-center gap-2 mb-5">
-        <span className="p-2 rounded-lg bg-brand-100 text-brand-700 dark:bg-brand-900/60 dark:text-brand-300">
-          <Save className="w-4 h-4" />
-        </span>
-        {editingLog ? '编辑学习记录' : '每日学习记录'}
-      </h2>
+    <section className="card p-4 sm:p-5">
+      <SectionHeader icon={Save} title={editingLog ? '编辑学习记录' : '每日学习记录'} />
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div>
@@ -88,7 +84,7 @@ export function DailyLogForm({ courses, editingLog, onSave, onCancelEdit }: Dail
               value={date}
               onChange={e => setDate(e.target.value)}
               required
-              className="w-full rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
+              className="input"
             />
           </div>
           <div className="sm:col-span-2 lg:col-span-1">
@@ -97,7 +93,7 @@ export function DailyLogForm({ courses, editingLog, onSave, onCancelEdit }: Dail
               value={course}
               onChange={e => setCourse(e.target.value)}
               required
-              className="w-full rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
+              className="input"
             >
               {courses.map(c => (
                 <option key={c.id} value={`${c.phase} — ${c.name}`}>{c.phase} — {c.name}</option>
@@ -114,7 +110,7 @@ export function DailyLogForm({ courses, editingLog, onSave, onCancelEdit }: Dail
               value={hours}
               onChange={e => setHours(Number(e.target.value))}
               required
-              className="w-full rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
+              className="input"
             />
           </div>
           <div>
@@ -122,7 +118,7 @@ export function DailyLogForm({ courses, editingLog, onSave, onCancelEdit }: Dail
             <select
               value={mood}
               onChange={e => setMood(e.target.value as Mood)}
-              className="w-full rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
+              className="input"
             >
               {moods.map(m => (
                 <option key={m} value={m}>{moodLabel(m)}</option>
@@ -140,7 +136,7 @@ export function DailyLogForm({ courses, editingLog, onSave, onCancelEdit }: Dail
               rows={3}
               required
               placeholder="今天看完的章节/视频/概念..."
-              className="w-full rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
+              className="input"
             />
           </div>
           <div>
@@ -151,7 +147,7 @@ export function DailyLogForm({ courses, editingLog, onSave, onCancelEdit }: Dail
               rows={3}
               required
               placeholder="完成的作业、项目、代码..."
-              className="w-full rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
+              className="input"
             />
           </div>
           <div>
@@ -162,7 +158,7 @@ export function DailyLogForm({ courses, editingLog, onSave, onCancelEdit }: Dail
               rows={3}
               required
               placeholder="没懂的地方、需要复习的点..."
-              className="w-full rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
+              className="input"
             />
           </div>
         </div>
@@ -174,21 +170,21 @@ export function DailyLogForm({ courses, editingLog, onSave, onCancelEdit }: Dail
             onChange={e => setReflection(e.target.value)}
             rows={2}
             placeholder="一句话总结..."
-            className="w-full rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
+            className="input"
           />
         </div>
 
         <div className="flex gap-3">
           <button
             type="submit"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-brand-600 text-white hover:bg-brand-700 transition-colors"
+            className="btn btn--solid px-4"
           >
             <Save className="w-4 h-4" /> {editingLog ? '更新记录' : '保存记录'}
           </button>
           <button
             type="button"
             onClick={reset}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-800 transition-colors"
+            className="btn btn--quiet px-4"
           >
             <RotateCcw className="w-4 h-4" /> 重置
           </button>

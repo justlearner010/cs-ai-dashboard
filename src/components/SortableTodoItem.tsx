@@ -110,7 +110,7 @@ function SortableTodoItem({ todo, courseId, onToggle, onDelete, onSetDueDate }, 
         <button
           {...attributes}
           {...listeners}
-          className="mt-1 p-1 text-slate-300 hover:text-slate-500 dark:text-slate-400 cursor-grab active:cursor-grabbing opacity-0 group-hover:opacity-100 transition-opacity"
+          className="btn btn--icon mt-1 !p-1 text-slate-300 hover:text-slate-500 dark:text-slate-400 cursor-grab active:cursor-grabbing opacity-0 group-hover:opacity-100 transition-opacity"
           title="拖动排序"
           aria-label="拖动排序"
         >
@@ -148,7 +148,7 @@ function SortableTodoItem({ todo, courseId, onToggle, onDelete, onSetDueDate }, 
         {onSetDueDate && (
           <button
             onClick={() => setShowDate(v => !v)}
-            className="opacity-0 group-hover:opacity-100 text-slate-400 dark:text-slate-500 hover:text-brand-600 p-1 rounded transition-all shrink-0"
+            className="btn btn--icon !p-1 opacity-0 group-hover:opacity-100 text-slate-400 dark:text-slate-500 hover:text-brand-600 transition-all shrink-0"
             title="设置截止日期"
             aria-label="设置截止日期"
           >
@@ -157,7 +157,7 @@ function SortableTodoItem({ todo, courseId, onToggle, onDelete, onSetDueDate }, 
         )}
         <button
           onClick={() => onDelete(courseId, todo.id)}
-          className="opacity-0 group-hover:opacity-100 text-slate-400 dark:text-slate-500 hover:text-red-600 p-1 rounded transition-all shrink-0"
+          className="btn btn--icon !p-1 opacity-0 group-hover:opacity-100 text-slate-400 dark:text-slate-500 hover:text-red-600 transition-all shrink-0"
           title="删除"
           aria-label="删除任务"
         >
@@ -171,7 +171,7 @@ function SortableTodoItem({ todo, courseId, onToggle, onDelete, onSetDueDate }, 
             value={todo.dueDate ?? ''}
             onChange={e => onSetDueDate(courseId, todo.id, e.target.value || undefined)}
             aria-label={`设置「${todo.text}」的截止日期`}
-            className="rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200 px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500"
+            className="input w-auto px-2 py-1 text-xs"
           />
           {todo.dueDate && (
             <button

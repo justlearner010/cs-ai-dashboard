@@ -12,7 +12,8 @@ import {
 import type { LogEntry } from '../types';
 import { Calendar, Flame, X, Clock3, CheckCircle2, PenLine, CircleHelp } from 'lucide-react';
 import { EmptyState } from './EmptyState';
-import { moodLabel } from '../utils/helpers';
+import { SectionHeader } from './SectionHeader';
+import { moodLabel, smoothScrollTo } from '../utils/helpers';
 import { MOTION } from '../motion/tokens';
 
 interface HeatmapProps {
@@ -22,10 +23,10 @@ interface HeatmapProps {
 
 const LEVELS = [
   { min: 0, max: 0, className: 'bg-slate-100 dark:bg-slate-700' },
-  { min: 0.5, max: 2, className: 'bg-emerald-200' },
-  { min: 2.5, max: 4, className: 'bg-emerald-300' },
-  { min: 4.5, max: 6, className: 'bg-emerald-400' },
-  { min: 6.5, max: Infinity, className: 'bg-emerald-500' },
+  { min: 0.5, max: 2, className: 'bg-emerald-200 dark:bg-emerald-900/70' },
+  { min: 2.5, max: 4, className: 'bg-emerald-300 dark:bg-emerald-800/80' },
+  { min: 4.5, max: 6, className: 'bg-emerald-400 dark:bg-emerald-700/80' },
+  { min: 6.5, max: Infinity, className: 'bg-emerald-500 dark:bg-emerald-600/90' },
 ];
 
 const WEEKDAYS = ['日', '一', '二', '三', '四', '五', '六'];
@@ -97,13 +98,11 @@ export function Heatmap({ logs, days = 365 }: HeatmapProps) {
 
   return (
     <section className="card p-4 sm:p-5">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <Calendar className="w-5 h-5 text-brand-600" />
-          <h2 className="text-lg font-semibold">学习热力图</h2>
-        </div>
-        <span className="text-xs text-slate-500 dark:text-slate-400">最近 {days} 天学习时长分布 · 点击格子查看当日详情</span>
-      </div>
+      <SectionHeader
+        icon={Calendar}
+        title="学习热力图"
+        muted={<span className="text-xs text-slate-600 dark:text-slate-400">最近 {days} 天学习时长分布 · 点击格子查看当日详情</span>}
+      />
 
       {!hasData ? (
         <EmptyState
@@ -113,7 +112,7 @@ export function Heatmap({ logs, days = 365 }: HeatmapProps) {
           action={{
             label: '去写日志',
             onClick: () => {
-              document.getElementById('daily-log-form')?.scrollIntoView({ behavior: 'smooth' });
+              smoothScrollTo('daily-log-form');
             },
           }}
         />
@@ -189,11 +188,11 @@ export function Heatmap({ logs, days = 365 }: HeatmapProps) {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
                 transition={{ duration: MOTION.duration.base / 1000, ease: MOTION.ease.out }}
-                className="mt-4 rounded-xl border border-slate-200/80 dark:border-slate-700/80 bg-slate-50/70 dark:bg-slate-800/70 p-4"
+                className="glass-subtle mt-4 rounded-xl p-4"
               >
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="px-3 py-1 bg-brand-100 text-brand-700 dark:bg-brand-900/60 dark:text-brand-300 text-xs font-semibold rounded-lg">
+                    <span className="pill bg-brand-50 text-brand-700 dark:bg-brand-900/60 dark:text-brand-300">
                       {selectedDate}
                     </span>
                     <span className="inline-flex items-center gap-1 text-sm font-semibold text-slate-800 dark:text-slate-200">
@@ -231,7 +230,7 @@ export function Heatmap({ logs, days = 365 }: HeatmapProps) {
 
 function DayLogItem({ log }: { log: LogEntry }) {
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200/80 dark:border-slate-700/80 p-3">
+    <div className="glass-subtle rounded-lg p-3">
       <div className="flex flex-wrap items-center gap-2 mb-2">
         <span className="font-semibold text-sm text-slate-900 dark:text-slate-100">{log.course}</span>
         <span className="text-xs text-slate-500 dark:text-slate-400">{log.hours}h · {moodLabel(log.mood)}</span>

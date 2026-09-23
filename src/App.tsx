@@ -17,10 +17,9 @@ import { TodayFocus } from "./components/TodayFocus";
 import { useTaskReminders } from "./hooks/useTaskReminders";
 import { useToast } from "./hooks/useToast";
 import { ThemeBackground, MyGoHero } from "./components/ThemeBackground";
-import { Reveal } from "./components/Reveal";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { LazySectionFallback } from "./components/LazyLoad";
-import { today, uuid, overallProgress } from "./utils/helpers";
+import { today, uuid, overallProgress, smoothScrollTo } from "./utils/helpers";
 import { generateBackupContent, type BackupPayload } from "./utils/backup";
 
 // 重型组件按需加载，减小首屏 bundle
@@ -420,8 +419,7 @@ export default function App() {
 
   const handleEditLog = useCallback((log: LogEntry) => {
     setEditingLog(log);
-    const form = document.getElementById("daily-log-form");
-    form?.scrollIntoView({ behavior: "smooth", block: "start" });
+    smoothScrollTo("daily-log-form", { block: "start" });
   }, []);
 
   const handleDeleteLog = useCallback(
@@ -517,7 +515,7 @@ export default function App() {
 
   const handleSelectCourseFromPath = useCallback((courseId: string) => {
     const element = document.getElementById(`course-${courseId}`);
-    element?.scrollIntoView({ behavior: "smooth", block: "center" });
+    if (element) smoothScrollTo(element, { block: "center" });
     element?.classList.add("ring-2", "ring-brand-400");
     setTimeout(
       () => element?.classList.remove("ring-2", "ring-brand-400"),
@@ -528,6 +526,8 @@ export default function App() {
   const { pct: progressPct } = overallProgress(courses);
 
   return (
+    // load-in 挂在 Header 与布局容器上（不含 ScrollProgress/MobileNav/BackToTop 等
+    // fixed 元素）：根节点带 transform 期间会成为 fixed 的包含块，首屏把底栏拉出视口
     <div className="min-h-screen pb-20 relative">
       <ThemeBackground />
       <ScrollProgress />
@@ -540,104 +540,86 @@ export default function App() {
         onToggleDark={toggleDark}
       />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 lg:flex lg:items-start lg:gap-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 lg:flex lg:items-start lg:gap-6 animate-load-in">
         <Sidebar progressPct={progressPct} />
 
         <main className="flex-1 min-w-0 space-y-6">
           <MyGoHero />
           <section id="section-today" className="scroll-mt-24">
-            <Reveal>
-              <TodayFocus
-                courses={courses}
-                logs={logs}
-                onToggleTodo={handleToggleTodo}
-                onJumpToCourse={handleSelectCourseFromPath}
-              />
-            </Reveal>
+            <TodayFocus
+              courses={courses}
+              logs={logs}
+              onToggleTodo={handleToggleTodo}
+              onJumpToCourse={handleSelectCourseFromPath}
+            />
           </section>
           <section id="section-overview" className="scroll-mt-24">
-            <Reveal>
-              <StatsCards courses={courses} logs={logs} />
-            </Reveal>
+            <StatsCards courses={courses} logs={logs} />
           </section>
 
           <Suspense fallback={<LazySectionFallback />}>
             <ErrorBoundary>
               <section id="section-radar" className="scroll-mt-24">
-                <Reveal>
-                  <RadarChart
-                    courses={courses}
-                    highlightedDimension={highlightedDimension}
-                  />
-                </Reveal>
+                <RadarChart
+                  courses={courses}
+                  highlightedDimension={highlightedDimension}
+                />
               </section>
             </ErrorBoundary>
             <ErrorBoundary>
               <section id="section-trend" className="scroll-mt-24">
-                <Reveal>
-                  <TrendStats courses={courses} logs={logs} />
-                </Reveal>
+                <TrendStats courses={courses} logs={logs} />
               </section>
             </ErrorBoundary>
             <ErrorBoundary>
               <section id="section-heatmap" className="scroll-mt-24">
-                <Reveal>
-                  <Heatmap logs={logs} days={365} />
-                </Reveal>
+                <Heatmap logs={logs} days={365} />
               </section>
             </ErrorBoundary>
             <ErrorBoundary>
               <section id="section-path" className="scroll-mt-24">
-                <Reveal>
-                  <LearningPath
-                    courses={courses}
-                    onSelectCourse={handleSelectCourseFromPath}
-                  />
-                </Reveal>
+                <LearningPath
+                  courses={courses}
+                  onSelectCourse={handleSelectCourseFromPath}
+                />
               </section>
             </ErrorBoundary>
           </Suspense>
 
           <ErrorBoundary>
             <section id="section-courses" className="scroll-mt-24">
-              <Reveal>
-                <CourseList
-                  courses={courses}
-                  onToggleTodo={handleToggleTodo}
-                  onAddTodo={handleAddTodo}
-                  onDeleteTodo={handleDeleteTodo}
-                  onSetDueDate={handleSetDueDate}
-                  onReorderTodos={handleReorderTodos}
-                  onHighlightDimension={setHighlightedDimension}
-                />
-              </Reveal>
+              <CourseList
+                courses={courses}
+                onToggleTodo={handleToggleTodo}
+                onAddTodo={handleAddTodo}
+                onDeleteTodo={handleDeleteTodo}
+                onSetDueDate={handleSetDueDate}
+                onReorderTodos={handleReorderTodos}
+                onHighlightDimension={setHighlightedDimension}
+              />
             </section>
           </ErrorBoundary>
 
           <div id="daily-log-form">
             <section id="section-daily" className="scroll-mt-24">
-              <Reveal>
-                <DailyLogForm
-                  courses={courses}
-                  editingLog={editingLog}
-                  onSave={handleSaveLog}
-                  onCancelEdit={() => setEditingLog(null)}
-                />
-              </Reveal>
+              <DailyLogForm
+                courses={courses}
+                editingLog={editingLog}
+                onSave={handleSaveLog}
+                onCancelEdit={() => setEditingLog(null)}
+              />
             </section>
           </div>
 
           <ErrorBoundary>
             <section id="section-logs" className="scroll-mt-24">
-              <Reveal>
-                <LogList
-                  courses={courses}
-                  logs={logs}
-                  onEdit={handleEditLog}
-                  onDelete={handleDeleteLog}
-                  onBatchDelete={handleBatchDeleteLogs}
-                />
-              </Reveal>
+              <LogList
+                courses={courses}
+                logs={logs}
+                onEdit={handleEditLog}
+                onDelete={handleDeleteLog}
+                onBatchDelete={handleBatchDeleteLogs}
+              />
             </section>
           </ErrorBoundary>
         </main>
