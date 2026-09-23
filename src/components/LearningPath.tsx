@@ -10,27 +10,47 @@ interface LearningPathProps {
   onSelectCourse?: (courseId: string) => void;
 }
 
-const phaseOrder = [
-  '① 编程与算法基础',
-  '② 系统与分布式',
-  '③ 深度学习与 LLM',
-  '④ Agent Runtime',
+// 路径图按列分组：⑤全栈 与 ⑥产品 在图上合并为「交付」一列（6 列在 1440 宽放不下；
+// 课程列表的阶段筛选仍按完整 phase 字符串分开）。
+// 按圈号前缀匹配而非完整串：阶段改名后，自定义课程 / e2e fixture 携带的旧阶段名仍能归列
+const pathColumns: { nums: string[]; short: string }[] = [
+  { nums: ['①'], short: '基础' },
+  { nums: ['②'], short: '系统' },
+  { nums: ['③'], short: 'AI' },
+  { nums: ['④'], short: 'Agent' },
+  { nums: ['⑤', '⑥'], short: '交付' },
 ];
 
-const phaseShort: Record<string, string> = {
-  '① 编程与算法基础': '基础',
-  '② 系统与分布式': '系统',
-  '③ 深度学习与 LLM': 'LLM',
-  '④ Agent Runtime': 'Agent',
-};
+const NODE_WIDTH = 164;
+const NODE_HEIGHT = 54;
+// fullName 按词换行的每行字符上限（9px 字号下约 130px，留出节点内边距）
+const FULL_NAME_MAX_CHARS = 28;
 
-const NODE_WIDTH = 112;
-const NODE_HEIGHT = 46;
-const PADDING_X = 56;
+/** 按空格贪心换行，保证全文显示（不做字符级截断） */
+function wrapWords(text: string, maxChars: number): string[] {
+  const words = text.split(' ');
+  const lines: string[] = [];
+  let cur = '';
+  for (const w of words) {
+    if (!cur) {
+      cur = w;
+      continue;
+    }
+    if ((cur + ' ' + w).length <= maxChars) {
+      cur += ' ' + w;
+    } else {
+      lines.push(cur);
+      cur = w;
+    }
+  }
+  if (cur) lines.push(cur);
+  return lines;
+}
+const PADDING_X = 48;
 const PADDING_TOP = 44;
 const PADDING_BOTTOM = 48;
 const ROW_GAP = 24;
-const COL_GAP_MIN = 24;
+const COL_GAP_MIN = 20;
 const MIN_COL_WIDTH = NODE_WIDTH + COL_GAP_MIN;
 
 export function LearningPath({ courses, onSelectCourse }: LearningPathProps) {
@@ -49,7 +69,7 @@ export function LearningPath({ courses, onSelectCourse }: LearningPathProps) {
   }, []);
 
   const { nodes, links, svgWidth, svgHeight, colCenters } = useMemo(() => {
-    const colCount = phaseOrder.length;
+    const colCount = pathColumns.length;
 
     // Column width: enough so the whole path fits the container, but never below min
     const colWidth = Math.max(
@@ -59,22 +79,17 @@ export function LearningPath({ courses, onSelectCourse }: LearningPathProps) {
     // Total width: left padding + node + (colCount-1) gaps + node + right padding
     const svgWidth = PADDING_X * 2 + colWidth * (colCount - 1) + NODE_WIDTH;
 
-    const coursesByPhase = new Map<string, Course[]>();
-    phaseOrder.forEach(phase => coursesByPhase.set(phase, []));
-    courses.forEach(c => {
-      const list = coursesByPhase.get(c.phase) || [];
-      list.push(c);
-      coursesByPhase.set(c.phase, list);
-    });
+    const coursesByColumn = pathColumns.map(col =>
+      courses.filter(c => col.nums.includes(c.phase.charAt(0)))
+    );
 
-    const maxCount = Math.max(...Array.from(coursesByPhase.values()).map(l => l.length));
+    const maxCount = Math.max(...coursesByColumn.map(list => list.length));
     const maxColHeight = maxCount * NODE_HEIGHT + (maxCount - 1) * ROW_GAP;
 
     const nodeMap = new Map<string, { id: string; name: string; x: number; y: number; phase: string; course: Course }>();
     const centers: number[] = [];
 
-    phaseOrder.forEach((phase, col) => {
-      const list = coursesByPhase.get(phase) || [];
+    coursesByColumn.forEach((list, col) => {
       const count = list.length;
       const totalHeight = count * NODE_HEIGHT + (count - 1) * ROW_GAP;
       // Vertically center this column within the tallest column
@@ -87,7 +102,7 @@ export function LearningPath({ courses, onSelectCourse }: LearningPathProps) {
           name: course.name,
           x,
           y: startY + row * (NODE_HEIGHT + ROW_GAP),
-          phase,
+          phase: course.phase,
           course,
         });
       });
@@ -129,15 +144,15 @@ export function LearningPath({ courses, onSelectCourse }: LearningPathProps) {
       <div ref={containerRef} className="overflow-x-auto pb-2">
         <svg width={svgWidth} height={svgHeight} className="min-w-full">
           {/* Phase column labels */}
-          {phaseOrder.map((phase, i) => (
+          {pathColumns.map((col, i) => (
             <text
-              key={phase}
+              key={col.short}
               x={colCenters[i]}
               y={18}
               textAnchor="middle"
               className="text-[11px] fill-slate-400 dark:fill-slate-500 font-medium"
             >
-              {phaseShort[phase]}
+              {col.short}
             </text>
           ))}
 
@@ -189,20 +204,34 @@ export function LearningPath({ courses, onSelectCourse }: LearningPathProps) {
               />
               <text
                 x={node.x + NODE_WIDTH / 2}
-                y={node.y + 20}
+                y={node.y + 18}
                 textAnchor="middle"
                 className="text-[11px] fill-slate-900 dark:fill-slate-100 font-semibold"
               >
-                {node.name.length > 12 ? node.name.slice(0, 11) + '…' : node.name}
+                {node.name}
               </text>
-              <text
-                x={node.x + NODE_WIDTH / 2}
-                y={node.y + 35}
-                textAnchor="middle"
-                className="text-[9px] fill-slate-400 dark:fill-slate-500"
-              >
-                {optional ? '选修' : (node.course.fullName.length > 20 ? node.course.fullName.slice(0, 19) + '…' : node.course.fullName)}
-              </text>
+              {optional ? (
+                <text
+                  x={node.x + NODE_WIDTH / 2}
+                  y={node.y + 34}
+                  textAnchor="middle"
+                  className="text-[9px] fill-slate-400 dark:fill-slate-500"
+                >
+                  选修
+                </text>
+              ) : (
+                wrapWords(node.course.fullName, FULL_NAME_MAX_CHARS).map((line, lineIdx) => (
+                  <text
+                    key={lineIdx}
+                    x={node.x + NODE_WIDTH / 2}
+                    y={node.y + 34 + lineIdx * 11}
+                    textAnchor="middle"
+                    className="text-[9px] fill-slate-400 dark:fill-slate-500"
+                  >
+                    {line}
+                  </text>
+                ))
+              )}
             </motion.g>
             );
           })}

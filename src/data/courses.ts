@@ -1,10 +1,10 @@
 import type { Course } from "../types";
 
 export const defaultCourses: Omit<Course, "todos">[] = [
-  // ============ Phase 1: 编程与算法基础 ============
+  // ============ Phase 1: 编程、算法与数学基础 ============
   {
     id: "cs50",
-    phase: "① 编程与算法基础",
+    phase: "① 编程、算法与数学基础",
     name: "Harvard CS50x",
     fullName: "Introduction to Computer Science",
     url: "https://cs50.harvard.edu/x/",
@@ -21,7 +21,7 @@ export const defaultCourses: Omit<Course, "todos">[] = [
   },
   {
     id: "missing",
-    phase: "① 编程与算法基础",
+    phase: "① 编程、算法与数学基础",
     name: "MIT Missing Semester",
     fullName: "The Missing Semester of Your CS Education",
     url: "https://missing.csail.mit.edu/",
@@ -42,7 +42,7 @@ export const defaultCourses: Omit<Course, "todos">[] = [
   },
   {
     id: "mit-algo",
-    phase: "① 编程与算法基础",
+    phase: "① 编程、算法与数学基础",
     name: "MIT 6.1210 / 6.006",
     fullName: "Introduction to Algorithms",
     url: "https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-fall-2011/",
@@ -63,7 +63,7 @@ export const defaultCourses: Omit<Course, "todos">[] = [
   },
   {
     id: "mit-math",
-    phase: "① 编程与算法基础",
+    phase: "① 编程、算法与数学基础",
     name: "MIT 6.1200",
     fullName: "Mathematics for Computer Science",
     url: "https://ocw.mit.edu/courses/6-042j-mathematics-for-computer-science-spring-2015/",
@@ -84,7 +84,7 @@ export const defaultCourses: Omit<Course, "todos">[] = [
   },
   {
     id: "mit-linear",
-    phase: "① 编程与算法基础",
+    phase: "① 编程、算法与数学基础",
     name: "MIT 18.06",
     fullName: "Linear Algebra (Gilbert Strang)",
     url: "https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/",
@@ -115,7 +115,7 @@ export const defaultCourses: Omit<Course, "todos">[] = [
   },
   {
     id: "mit-probability",
-    phase: "① 编程与算法基础",
+    phase: "① 编程、算法与数学基础",
     name: "MIT 18.600",
     fullName: "Probability and Random Variables",
     url: "https://ocw.mit.edu/courses/18-600-probability-and-random-variables-fall-2019/",
@@ -248,10 +248,10 @@ export const defaultCourses: Omit<Course, "todos">[] = [
       { type: "code", title: "Lab 代码", url: "https://github.com/6.824" },
     ],
   },
-  // ============ Phase 3: 深度学习与 LLM ============
+  // ============ Phase 3: 机器学习与 LLM ============
   {
     id: "karpathy-ztp",
-    phase: "③ 深度学习与 LLM",
+    phase: "③ 机器学习与 LLM",
     name: "Zero to Hero (Karpathy)",
     fullName: "Neural Networks: Zero to Hero",
     url: "https://karpathy.ai/zero-to-hero.html",
@@ -277,7 +277,7 @@ export const defaultCourses: Omit<Course, "todos">[] = [
   },
   {
     id: "stanford-ml",
-    phase: "③ 深度学习与 LLM",
+    phase: "③ 机器学习与 LLM",
     name: "Stanford CS229",
     fullName: "Machine Learning",
     url: "https://cs229.stanford.edu/",
@@ -294,7 +294,7 @@ export const defaultCourses: Omit<Course, "todos">[] = [
   },
   {
     id: "stanford-nlp",
-    phase: "③ 深度学习与 LLM",
+    phase: "③ 机器学习与 LLM",
     name: "Stanford CS224N",
     fullName: "NLP with Deep Learning",
     url: "https://web.stanford.edu/class/cs224n/",
@@ -315,7 +315,7 @@ export const defaultCourses: Omit<Course, "todos">[] = [
   },
   {
     id: "llm-inference",
-    phase: "③ 深度学习与 LLM",
+    phase: "③ 机器学习与 LLM",
     name: "LLM Systems",
     fullName: "LLM Inference & Serving Runtime",
     url: "https://github.com/vllm-project/vllm",
@@ -336,27 +336,6 @@ export const defaultCourses: Omit<Course, "todos">[] = [
         type: "code",
         title: "llama.cpp",
         url: "https://github.com/ggml-org/llama.cpp",
-      },
-    ],
-  },
-  {
-    id: "stanford-moderndev",
-    phase: "③ 深度学习与 LLM",
-    name: "Stanford CS146S",
-    fullName: "The Modern Software Developer (Fall 2026)",
-    url: "https://themodernsoftware.dev",
-    skills: ["LLM", "Tool Orchestration", "Testing / Debugging"],
-    prerequisites: ["stanford-ml", "llm-inference"],
-    resources: [
-      {
-        type: "notes",
-        title: "课程主页",
-        url: "https://themodernsoftware.dev",
-      },
-      {
-        type: "video",
-        title: "课程介绍（Mihail Eric）",
-        url: "https://themodernsoftware.dev",
       },
     ],
   },
@@ -413,6 +392,178 @@ export const defaultCourses: Omit<Course, "todos">[] = [
         type: "notes",
         title: "Durable Execution",
         url: "https://docs.temporal.io/",
+      },
+    ],
+  },
+  {
+    id: "hf-agents",
+    phase: "④ Agent Runtime",
+    name: "HuggingFace Agents",
+    fullName: "HuggingFace Agents Course",
+    url: "https://huggingface.co/learn/agents-course",
+    skills: ["Tool Orchestration", "State", "LLM"],
+    prerequisites: ["stanford-nlp"],
+    resources: [
+      {
+        type: "notes",
+        title: "课程主页",
+        url: "https://huggingface.co/learn/agents-course",
+      },
+      {
+        type: "code",
+        title: "课程 GitHub 仓库",
+        url: "https://github.com/huggingface/agents-course",
+      },
+    ],
+  },
+  {
+    id: "dlai-eval-agents",
+    phase: "④ Agent Runtime",
+    name: "Evaluating AI Agents",
+    fullName: "Evaluating AI Agents (DeepLearning.AI)",
+    url: "https://www.deeplearning.ai/courses/evaluating-ai-agents/",
+    skills: ["Observability", "Testing / Debugging", "Tool Orchestration"],
+    prerequisites: ["stanford-nlp"],
+    resources: [
+      {
+        type: "notes",
+        title: "DeepLearning.AI 课程页",
+        url: "https://www.deeplearning.ai/courses/evaluating-ai-agents/",
+      },
+      {
+        type: "notes",
+        title: "LangGraph 文档（实践参考）",
+        url: "https://langchain-ai.github.io/langgraph/",
+      },
+    ],
+  },
+  {
+    // 内容是 Agent 开发方法论（MCP / Agent Skills / Loop），按内容归 ④ 而非 ③
+    id: "stanford-moderndev",
+    phase: "④ Agent Runtime",
+    name: "Stanford CS146S",
+    fullName: "The Modern Software Developer (Fall 2026)",
+    url: "https://themodernsoftware.dev",
+    skills: ["LLM", "Tool Orchestration", "Testing / Debugging"],
+    prerequisites: ["stanford-ml", "llm-inference"],
+    resources: [
+      {
+        type: "notes",
+        title: "课程主页",
+        url: "https://themodernsoftware.dev",
+      },
+      {
+        type: "video",
+        title: "课程介绍（Mihail Eric）",
+        url: "https://themodernsoftware.dev",
+      },
+    ],
+  },
+  // ============ Phase 5: 全栈工程 ============
+  {
+    id: "fullstack-open",
+    phase: "⑤ 全栈工程",
+    name: "Full Stack Open",
+    fullName: "Full Stack Open (University of Helsinki)",
+    url: "https://fullstackopen.com/en/",
+    skills: ["Software Construction", "Testing / Debugging", "Database"],
+    // 不设跨列前置：从 ① 拉到 ⑤ 的长边会横穿中间列节点，图上误导性大于提示价值
+    prerequisites: [],
+    resources: [
+      {
+        type: "notes",
+        title: "课程主页（英文）",
+        url: "https://fullstackopen.com/en/",
+      },
+      {
+        type: "code",
+        title: "GitHub 组织 fullstack-hy2020",
+        url: "https://github.com/fullstack-hy2020",
+      },
+    ],
+  },
+  {
+    id: "cs50w",
+    phase: "⑤ 全栈工程",
+    name: "Harvard CS50W",
+    fullName: "Web Programming with Python & JavaScript",
+    url: "https://cs50.harvard.edu/web/",
+    skills: ["Software Construction", "Database", "Testing / Debugging"],
+    prerequisites: [],
+    resources: [
+      {
+        type: "notes",
+        title: "课程主页",
+        url: "https://cs50.harvard.edu/web/",
+      },
+      {
+        type: "notes",
+        title: "Django 官方文档",
+        url: "https://docs.djangoproject.com/en/5.0/",
+      },
+    ],
+  },
+  // ============ Phase 6: 产品与设计 ============
+  {
+    id: "figma-design",
+    phase: "⑥ 产品与设计",
+    name: "Figma Learn Design",
+    fullName: "Design Basics with Figma",
+    url: "https://www.figma.com/resources/learn-design/",
+    skills: ["UI Design"],
+    prerequisites: [],
+    resources: [
+      {
+        type: "notes",
+        title: "Figma 设计基础",
+        url: "https://www.figma.com/resources/learn-design/",
+      },
+      {
+        type: "notes",
+        title: "Figma 帮助中心",
+        url: "https://help.figma.com/hc/en-us",
+      },
+    ],
+  },
+  {
+    id: "google-ux",
+    phase: "⑥ 产品与设计",
+    name: "Google UX Design",
+    fullName: "Google UX Design Professional Certificate",
+    url: "https://www.coursera.org/professional-certificates/google-ux-design",
+    skills: ["UX Research", "UI Design"],
+    prerequisites: [],
+    resources: [
+      {
+        type: "notes",
+        title: "Coursera 证书页",
+        url: "https://www.coursera.org/professional-certificates/google-ux-design",
+      },
+      {
+        type: "notes",
+        title: "Google Design",
+        url: "https://design.google/",
+      },
+    ],
+  },
+  {
+    id: "intro-pm",
+    phase: "⑥ 产品与设计",
+    name: "Intro to Product Mgmt",
+    fullName: "Introduction to Product Management",
+    url: "https://www.coursera.org/learn/introduction-to-product-management",
+    skills: ["Product Requirements"],
+    prerequisites: [],
+    resources: [
+      {
+        type: "notes",
+        title: "Coursera 课程页",
+        url: "https://www.coursera.org/learn/introduction-to-product-management",
+      },
+      {
+        type: "notes",
+        title: "产品经理学习路线（roadmap.sh）",
+        url: "https://roadmap.sh/product-manager",
       },
     ],
   },
@@ -1996,6 +2147,479 @@ const defaultTodos: Record<
     {
       type: "question",
       text: "Durable Execution 的确定性重放对副作用的工具调用有哪些约束？",
+    },
+  ],
+
+  "hf-agents": [
+    {
+      type: "knowledge",
+      text: "Unit 0: 课程概览——Agent 定义、LLM + 工具调用 + 观察的循环",
+    },
+    {
+      type: "knowledge",
+      text: "Unit 1: Tool Calling 基础——function schema、OpenAI/Anthropic 工具接口",
+    },
+    {
+      type: "knowledge",
+      text: "Unit 1: 流式工具调用、错误处理与结构化输出校验",
+    },
+    {
+      type: "knowledge",
+      text: "Unit 2: RAG Agent——检索工具、embedding 检索循环、引用生成",
+    },
+    {
+      type: "knowledge",
+      text: "Unit 3: Code Agents（smolagents）——生成代码代替 JSON 参数调用",
+    },
+    {
+      type: "knowledge",
+      text: "Unit 4: 多 Agent 工作流——handoff、supervisor、任务分发",
+    },
+    {
+      type: "knowledge",
+      text: "Unit 5: 可观测性与评测——trace 回放、成功率与 token 效率",
+    },
+    {
+      type: "lab",
+      text: "Lab 1: 写一个最小工具调用 Agent（计算器 + 时间两个自定义工具）",
+    },
+    {
+      type: "lab",
+      text: "Lab 2: 给工具调用加 schema 校验、超时与失败重试",
+    },
+    {
+      type: "lab",
+      text: "Lab 3: 构建文档问答 RAG Agent（向量检索 + 回答附引用来源）",
+    },
+    {
+      type: "lab",
+      text: "Lab 4: 用 smolagents 实现 CodeAgent，让它自己写代码完成多步任务",
+    },
+    {
+      type: "lab",
+      text: "Lab 5: 搭一个 supervisor + 2 个 sub-agent 的研究助手",
+    },
+    {
+      type: "lab",
+      text: "Lab 6: 记录完整轨迹，统计各步成功率与 token 消耗",
+    },
+    {
+      type: "question",
+      text: "ReAct 循环里的自由文本「思考」与原生 function calling 各自的优劣是什么？",
+    },
+    {
+      type: "question",
+      text: "多 Agent handoff 时上下文如何裁剪才不丢关键约束？",
+    },
+    {
+      type: "question",
+      text: "如何设计最小可用的 Agent 评测集：任务怎么选、评分器怎么写、怎么防回归？",
+    },
+  ],
+
+  "dlai-eval-agents": [
+    {
+      type: "knowledge",
+      text: "为什么准确率不够——Agent 多步任务的过程质量与结果质量",
+    },
+    {
+      type: "knowledge",
+      text: "评测集设计：任务分布、难度分层、黄金轨迹与边界用例",
+    },
+    {
+      type: "knowledge",
+      text: "LLM-as-a-Judge：rubric 设计、位置/长度偏差与校准",
+    },
+    {
+      type: "knowledge",
+      text: "轨迹分析与失败归因：规划 / 工具选择 / 执行 / 幻觉四类",
+    },
+    {
+      type: "knowledge",
+      text: "回归测试进 CI——让 Agent 评测守护每次 prompt/模型变更",
+    },
+    {
+      type: "knowledge",
+      text: "在线指标：任务完成率、成本、延迟、人工接管率",
+    },
+    {
+      type: "lab",
+      text: "Lab 1: 为你的 Agent 写 10 条黄金测试任务与评分标准",
+    },
+    {
+      type: "lab",
+      text: "Lab 2: 实现一个 LLM-as-Judge 打分器，并做人工一致性抽检",
+    },
+    {
+      type: "lab",
+      text: "Lab 3: 对比两版 prompt 的轨迹差异，归因到具体失败步骤",
+    },
+    {
+      type: "lab",
+      text: "Lab 4: 把评测脚本接入 CI，PR 上自动跑回归",
+    },
+    {
+      type: "question",
+      text: "Judge 模型与被评模型同源时会有哪些系统性偏差？如何缓解？",
+    },
+    {
+      type: "question",
+      text: "过程奖励与结果奖励分别适合 Agent 迭代的什么阶段？",
+    },
+    {
+      type: "question",
+      text: "样本量很小（几十条）时，评测结论的置信度如何判断？",
+    },
+  ],
+
+  "fullstack-open": [
+    {
+      type: "knowledge",
+      text: "Part 0: 前端回顾——浏览器、DOM、React 心智模型与开发工具",
+    },
+    {
+      type: "knowledge",
+      text: "Part 1: React 组件、props/state、条件渲染与列表 key",
+    },
+    {
+      type: "knowledge",
+      text: "Part 2: 状态提升、Hooks（useState/useEffect）与数据获取",
+    },
+    {
+      type: "knowledge",
+      text: "Part 3: Node/Express 后端——REST API、中间件与错误处理",
+    },
+    {
+      type: "knowledge",
+      text: "Part 4: 用户认证——token、session、bcrypt 与权限控制",
+    },
+    {
+      type: "knowledge",
+      text: "Part 5: 测试——Jest、Playwright、覆盖率的取舍",
+    },
+    {
+      type: "knowledge",
+      text: "Part 6: 服务端渲染与性能——缓存、分页、状态管理",
+    },
+    {
+      type: "knowledge",
+      text: "Part 7: React 路由、表单校验与组件库选型",
+    },
+    {
+      type: "knowledge",
+      text: "Part 8: GraphQL——schema、resolver 与 N+1 问题",
+    },
+    {
+      type: "knowledge",
+      text: "Part 9: TypeScript 前后端——类型定义、泛型、与 React 结合",
+    },
+    {
+      type: "knowledge",
+      text: "Part 10: CI/CD 与部署——容器、环境变量、数据库迁移",
+    },
+    {
+      type: "lab",
+      text: "Part 1 练习：记事本应用（组件拆分、受控表单、列表 key）",
+    },
+    {
+      type: "lab",
+      text: "Part 2 练习：国家信息浏览（REST API + 过滤 + 分页）",
+    },
+    {
+      type: "lab",
+      text: "Part 3 练习：博客 API（CRUD、中间件校验、错误边界）",
+    },
+    {
+      type: "lab",
+      text: "Part 4 练习：带登录的待办应用（JWT、受保护路由）",
+    },
+    {
+      type: "lab",
+      text: "Part 5 练习：为登录待办应用补集成测试",
+    },
+    {
+      type: "lab",
+      text: "Part 10 练习：容器化并部署到云端（含健康检查与迁移脚本）",
+    },
+    {
+      type: "question",
+      text: "什么场景选 REST、什么场景选 GraphQL？N+1 问题如何系统性避免？",
+    },
+    {
+      type: "question",
+      text: "JWT 与 session-cookie 在 XSS / CSRF 面上各自如何防护？",
+    },
+    {
+      type: "question",
+      text: "前后端同仓（monorepo）与分仓的边界怎么划？",
+    },
+  ],
+
+  "cs50w": [
+    {
+      type: "knowledge",
+      text: "HTML/CSS 语义化标签、可访问性要点与响应式布局",
+    },
+    {
+      type: "knowledge",
+      text: "JavaScript 进阶——事件、DOM 操作、异步 fetch / async",
+    },
+    {
+      type: "knowledge",
+      text: "Flask 路由、Jinja 模板、表单处理与 session",
+    },
+    {
+      type: "knowledge",
+      text: "Django 项目结构——MVT、admin、URL conf",
+    },
+    {
+      type: "knowledge",
+      text: "模型与迁移——外键、多对多、QuerySet 优化（select_related）",
+    },
+    {
+      type: "knowledge",
+      text: "REST API——序列化器、DRF、分页与鉴权",
+    },
+    {
+      type: "knowledge",
+      text: "前后端交互——JS 消费 API、SPA 思路与 CSRF 防护",
+    },
+    {
+      type: "knowledge",
+      text: "测试与部署——Django test client、静态文件与环境配置",
+    },
+    {
+      type: "lab",
+      text: "Search：仿搜索引擎前端（静态页 + JS 过滤）",
+    },
+    {
+      type: "lab",
+      text: "Wiki：Django 百科——页面、编辑、随机与搜索",
+    },
+    {
+      type: "lab",
+      text: "Commerce：电商——拍卖、出价、评论、收藏（模型关系综合）",
+    },
+    {
+      type: "lab",
+      text: "Mail：前后端分离收发邮件（API + fetch 单页交互）",
+    },
+    {
+      type: "lab",
+      text: "Network：社交网络——关注流、分页与无限滚动",
+    },
+    {
+      type: "question",
+      text: "Django ORM 的 N+1 何时发生？select_related / prefetch_related 如何对症下药？",
+    },
+    {
+      type: "question",
+      text: "同一功能用 Flask 和 Django 各实现一遍，边界与样板代码差在哪？",
+    },
+    {
+      type: "question",
+      text: "出价这类「有业务规则的写操作」如何防并发冲突（乐观锁/唯一约束）？",
+    },
+  ],
+
+  "figma-design": [
+    {
+      type: "knowledge",
+      text: "设计基础四原则——对比、对齐、重复、亲密性（CRAP）",
+    },
+    {
+      type: "knowledge",
+      text: "视觉层级——字号阶梯、留白与注意力路径",
+    },
+    {
+      type: "knowledge",
+      text: "颜色系统——色板、对比度（WCAG AA）、语义色",
+    },
+    {
+      type: "knowledge",
+      text: "字体排印——字族选择、行高、中英混排",
+    },
+    {
+      type: "knowledge",
+      text: "组件化——Figma 组件、变体（variants）与设计令牌",
+    },
+    {
+      type: "knowledge",
+      text: "原型与交互——连接、状态、微交互标注",
+    },
+    {
+      type: "knowledge",
+      text: "响应式——约束（constraints）、Auto Layout 与断点",
+    },
+    {
+      type: "knowledge",
+      text: "交付——标注、切图与开发协作规范",
+    },
+    {
+      type: "lab",
+      text: "Lab 1: 临摹一个仪表盘首页，只用对齐与间距、不靠颜色建立层级",
+    },
+    {
+      type: "lab",
+      text: "Lab 2: 把一组按钮做成组件 + 4 态变体（default/hover/disabled/loading）",
+    },
+    {
+      type: "lab",
+      text: "Lab 3: 用 Auto Layout 把固定像素页面重构为可伸缩布局",
+    },
+    {
+      type: "lab",
+      text: "Lab 4: 出一套亮/暗主题语义色令牌并测对比度",
+    },
+    {
+      type: "lab",
+      text: "Lab 5: 3 个屏幕的可点击原型（首页 → 详情 → 完成反馈）",
+    },
+    {
+      type: "question",
+      text: "什么时候用颜色强调，什么时候只靠字重和留白就够？",
+    },
+    {
+      type: "question",
+      text: "设计令牌如何命名才能同时服务设计稿与代码？",
+    },
+    {
+      type: "question",
+      text: "移动端与桌面端的间距体系如何共用一套尺度？",
+    },
+  ],
+
+  "google-ux": [
+    {
+      type: "knowledge",
+      text: "阶段 1 共情——访谈提纲、用户画像、痛点聚类",
+    },
+    {
+      type: "knowledge",
+      text: "阶段 1——可用性启发式评估与竞品分析框架",
+    },
+    {
+      type: "knowledge",
+      text: "阶段 2 定义——问题陈述、价值主张、成功指标",
+    },
+    {
+      type: "knowledge",
+      text: "阶段 2——用户旅程图与信息架构（站点地图）",
+    },
+    {
+      type: "knowledge",
+      text: "阶段 3 线框——低保真快速迭代与可点击原型",
+    },
+    {
+      type: "knowledge",
+      text: "阶段 3——可用性测试：任务设计、出声思维、问题分级",
+    },
+    {
+      type: "knowledge",
+      text: "阶段 4 视觉打磨——无障碍（对比度/焦点/键盘）与响应式",
+    },
+    {
+      type: "knowledge",
+      text: "作品集——从过程记录到决策叙事",
+    },
+    {
+      type: "lab",
+      text: "Lab 1: 针对一个真实痛点做 5 人迷你访谈并输出洞察",
+    },
+    {
+      type: "lab",
+      text: "Lab 2: 写一页问题陈述 + 可度量的成功指标",
+    },
+    {
+      type: "lab",
+      text: "Lab 3: 纸上画 3 个方案线框，收敛为 1 个高保真流程",
+    },
+    {
+      type: "lab",
+      text: "Lab 4: 做一次 3 人可用性测试，修掉 top 3 问题",
+    },
+    {
+      type: "lab",
+      text: "Lab 5: 按 WCAG AA 自查最终稿并修复不达标项",
+    },
+    {
+      type: "question",
+      text: "可用性问题如何分级（阻断/严重/轻微）？修复优先级怎么排？",
+    },
+    {
+      type: "question",
+      text: "MVP 阶段「快速交付」与「充分研究」的取舍点在哪？",
+    },
+    {
+      type: "question",
+      text: "如何区分用户「说想要的」与「真正需要的」？",
+    },
+  ],
+
+  "intro-pm": [
+    {
+      type: "knowledge",
+      text: "产品经理的角色——发现、定义、交付、迭代四环",
+    },
+    {
+      type: "knowledge",
+      text: "用户需求 vs 解决方案——JTBD 与问题访谈技巧",
+    },
+    {
+      type: "knowledge",
+      text: "竞品与市场分析——细分、差异化与定位",
+    },
+    {
+      type: "knowledge",
+      text: "需求文档 PRD——目标、范围、用户故事、验收标准（Given/When/Then）",
+    },
+    {
+      type: "knowledge",
+      text: "优先级框架——RICE、MoSCoW 与机会成本",
+    },
+    {
+      type: "knowledge",
+      text: "指标体系——北极星指标、漏斗分析、A/B 测试入门",
+    },
+    {
+      type: "knowledge",
+      text: "路线图与发布——里程碑、依赖与干系人沟通",
+    },
+    {
+      type: "knowledge",
+      text: "敏捷协作——sprint、backlog 梳理、与设计/工程的接口",
+    },
+    {
+      type: "lab",
+      text: "Lab 1: 选一个你常用的 App，写竞品对比表 + 差异化机会",
+    },
+    {
+      type: "lab",
+      text: "Lab 2: 对 3 个用户做问题访谈，输出 JTBD 陈述",
+    },
+    {
+      type: "lab",
+      text: "Lab 3: 为这个仪表盘写一份 PRD（含 5 条带验收标准的用户故事）",
+    },
+    {
+      type: "lab",
+      text: "Lab 4: 用 RICE 给 10 个需求打分排序并说明取舍",
+    },
+    {
+      type: "lab",
+      text: "Lab 5: 定义北极星指标 + 2 个护栏指标，画出转化漏斗",
+    },
+    {
+      type: "question",
+      text: "「客户要更快的马」类需求如何验证真伪？",
+    },
+    {
+      type: "question",
+      text: "验收标准写到什么粒度，才既不束缚实现又能直接转测试？",
+    },
+    {
+      type: "question",
+      text: "没有数据基础的新产品，第一版指标怎么定才不虚荣？",
     },
   ],
 };
