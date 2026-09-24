@@ -4,6 +4,7 @@ import { SIDEBAR_ITEMS } from '../data/navItems';
 import { useActiveSection } from '../hooks/useActiveSection';
 import { MOTION } from '../motion/tokens';
 import { smoothScrollTo } from '../utils/helpers';
+import { GlassSurface } from './glass/GlassSurface';
 
 /**
  * 移动端底部芯片导航（< lg 显示）。
@@ -19,8 +20,9 @@ export function MobileNav() {
   }, [activeId]);
 
   return (
-    <nav
-      className="lg:hidden fixed bottom-0 inset-x-0 z-30
+    <GlassSurface
+      role="navigation"
+      className="lg:!hidden fixed bottom-0 inset-x-0 z-30
                  glass-strong border-x-0 border-b-0
                  pb-[env(safe-area-inset-bottom)]"
     >
@@ -53,6 +55,6 @@ export function MobileNav() {
           );
         })}
       </div>
-    </nav>
+    </GlassSurface>
   );
 }

@@ -15,6 +15,7 @@ import { computeStreak, totalHours } from '../utils/helpers';
 import { format, startOfWeek, endOfWeek, addWeeks } from 'date-fns';
 import { SectionHeader } from './SectionHeader';
 import { EmptyState } from './EmptyState';
+import { GlassSurface } from './glass/GlassSurface';
 
 interface TrendStatsProps {
   courses: Course[];
@@ -76,7 +77,7 @@ export default function TrendStats({ courses, logs }: TrendStatsProps) {
   const hasData = logs.length > 0;
 
   return (
-    <section className="card p-4 sm:p-5" data-testid="trend-section">
+    <GlassSurface className="card p-4 sm:p-5" data-testid="trend-section">
       <SectionHeader
         icon={TrendingUp}
         title="学习趋势"
@@ -166,7 +167,7 @@ export default function TrendStats({ courses, logs }: TrendStatsProps) {
           </div>
         </>
       )}
-    </section>
+    </GlassSurface>
   );
 }
 

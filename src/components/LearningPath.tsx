@@ -4,6 +4,7 @@ import type { Course } from '../types';
 import { MapPin } from 'lucide-react';
 import { MOTION } from '../motion/tokens';
 import { SectionHeader } from './SectionHeader';
+import { GlassSurface } from './glass/GlassSurface';
 
 interface LearningPathProps {
   courses: Course[];
@@ -134,7 +135,7 @@ export function LearningPath({ courses, onSelectCourse }: LearningPathProps) {
   }, [courses, containerWidth]);
 
   return (
-    <section className="card p-4 sm:p-5">
+    <GlassSurface className="card p-4 sm:p-5">
       <SectionHeader
         icon={MapPin}
         title="学习路径图"
@@ -241,6 +242,6 @@ export function LearningPath({ courses, onSelectCourse }: LearningPathProps) {
       <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
         点击节点可跳转到对应课程卡片。箭头表示建议的前置依赖关系。
       </p>
-    </section>
+    </GlassSurface>
   );
 }

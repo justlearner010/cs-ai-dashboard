@@ -6,6 +6,8 @@
  * 注：Logo 与角色图为官方素材，请确保仅限个人学习使用，
  *     并尊重原作者（动画 It's MyGO!!!!! / 芳文社 / Bushiroad）版权。
  */
+import { GlassSurface } from './glass/GlassSurface';
+
 export function ThemeBackground() {
   return (
     <div
@@ -60,7 +62,7 @@ export function ThemeBackground() {
  */
 export function MyGoHero() {
   return (
-    <div className="card relative overflow-hidden p-2">
+    <GlassSurface className="card relative overflow-hidden p-2">
       <img
         src={`${import.meta.env.BASE_URL}MyGO!!!!!_10th_anniversary_kv_banner_v2.webp`}
         alt="MyGO!!!!! 角色图（官方素材）"
@@ -73,6 +75,6 @@ export function MyGoHero() {
       />
       {/* 底部渐变 fade-out，让横幅与下方内容平滑过渡 */}
       <div className="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-[#f5f6f8] dark:from-[#0e1016] to-transparent pointer-events-none" />
-    </div>
+    </GlassSurface>
   );
 }

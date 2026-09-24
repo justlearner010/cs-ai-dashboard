@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Copy, Download, FileText } from 'lucide-react';
 import type { BackupPayload } from '../utils/backup';
 import { MOTION } from '../motion/tokens';
+import { GlassSurface } from './glass/GlassSurface';
 
 interface BackupModalProps {
   payload: BackupPayload | null;
@@ -58,8 +59,12 @@ export function BackupModal({ payload, onClose }: BackupModalProps) {
             exit={{ opacity: 0, scale: 0.95, y: -20 }}
             transition={{ duration: MOTION.duration.slow / 1000, ease: MOTION.ease.out }}
             onClick={e => e.stopPropagation()}
-            className="glass-strong rounded-2xl w-full max-w-3xl max-h-[80vh] flex flex-col"
+            className="w-full max-w-3xl"
           >
+            <GlassSurface
+              display="flex"
+              className="glass-strong rounded-2xl w-full max-h-[80vh] flex flex-col"
+            >
             <div className="flex items-center justify-between p-4 border-b border-white/50 dark:border-slate-700/60">
               <div className="flex items-center gap-2">
                 <FileText className="w-5 h-5 text-brand-600" />
@@ -131,6 +136,7 @@ export function BackupModal({ payload, onClose }: BackupModalProps) {
                 <Copy className="w-4 h-4" /> {copied ? '已复制' : '复制'}
               </button>
             </div>
+            </GlassSurface>
           </motion.div>
         </motion.div>
       )}

@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { SIDEBAR_ITEMS } from '../data/navItems';
 import { useActiveSection } from '../hooks/useActiveSection';
 import { MOTION } from '../motion/tokens';
+import { GlassSurface } from './glass/GlassSurface';
 
 function ProgressRing({ pct }: { pct: number }) {
   const r = 15;
@@ -35,7 +36,8 @@ export function Sidebar({ progressPct }: { progressPct: number }) {
 
   return (
     <aside className="hidden lg:block w-52 shrink-0">
-      <nav
+      <GlassSurface
+        role="navigation"
         className="card sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto pr-1 py-2"
       >
         <ProgressRing pct={progressPct} />
@@ -69,7 +71,7 @@ export function Sidebar({ progressPct }: { progressPct: number }) {
             );
           })}
         </ul>
-      </nav>
+      </GlassSurface>
     </aside>
   );
 }

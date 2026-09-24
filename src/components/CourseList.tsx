@@ -5,6 +5,7 @@ import { CourseCard } from './CourseCard';
 import { EmptyState } from './EmptyState';
 import { SectionHeader } from './SectionHeader';
 import { staggerStyle } from '../motion/tokens';
+import { GlassSurface } from './glass/GlassSurface';
 
 interface CourseListProps {
   courses: Course[];
@@ -36,7 +37,7 @@ export function CourseList({
   });
 
   return (
-    <section className="card p-4 sm:p-5">
+    <GlassSurface className="card p-4 sm:p-5">
       <SectionHeader
         icon={BookOpen}
         title="课程与任务清单"
@@ -99,6 +100,6 @@ export function CourseList({
           ))}
         </div>
       )}
-    </section>
+    </GlassSurface>
   );
 }

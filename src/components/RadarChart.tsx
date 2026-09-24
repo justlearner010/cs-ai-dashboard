@@ -11,6 +11,7 @@ import { Radar } from 'lucide-react';
 import type { Course } from '../types';
 import { computeSkillRadarData } from '../utils/helpers';
 import { SectionHeader } from './SectionHeader';
+import { GlassSurface } from './glass/GlassSurface';
 
 interface RadarChartProps {
   courses: Course[];
@@ -21,7 +22,7 @@ export function RadarChart({ courses, highlightedDimension }: RadarChartProps) {
   const data = computeSkillRadarData(courses);
 
   return (
-    <section className="card p-4 sm:p-5">
+    <GlassSurface className="card p-4 sm:p-5">
       <SectionHeader
         icon={Radar}
         title="能力雷达图"
@@ -74,6 +75,6 @@ export function RadarChart({ courses, highlightedDimension }: RadarChartProps) {
           </ReRadarChart>
         </ResponsiveContainer>
       </div>
-    </section>
+    </GlassSurface>
   );
 }

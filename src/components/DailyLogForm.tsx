@@ -3,6 +3,7 @@ import { Save, RotateCcw } from 'lucide-react';
 import type { Course, LogEntry, Mood } from '../types';
 import { uuid, today, moodLabel } from '../utils/helpers';
 import { SectionHeader } from './SectionHeader';
+import { GlassSurface } from './glass/GlassSurface';
 
 interface DailyLogFormProps {
   courses: Course[];
@@ -73,7 +74,7 @@ export function DailyLogForm({ courses, editingLog, onSave, onCancelEdit }: Dail
   };
 
   return (
-    <section className="card p-4 sm:p-5">
+    <GlassSurface className="card p-4 sm:p-5">
       <SectionHeader icon={Save} title={editingLog ? '编辑学习记录' : '每日学习记录'} />
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -190,6 +191,6 @@ export function DailyLogForm({ courses, editingLog, onSave, onCancelEdit }: Dail
           </button>
         </div>
       </form>
-    </section>
+    </GlassSurface>
   );
 }

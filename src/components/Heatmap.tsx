@@ -15,6 +15,7 @@ import { EmptyState } from './EmptyState';
 import { SectionHeader } from './SectionHeader';
 import { moodLabel, smoothScrollTo } from '../utils/helpers';
 import { MOTION } from '../motion/tokens';
+import { GlassSurface } from './glass/GlassSurface';
 
 interface HeatmapProps {
   logs: LogEntry[];
@@ -97,7 +98,7 @@ export function Heatmap({ logs, days = 365 }: HeatmapProps) {
   };
 
   return (
-    <section className="card p-4 sm:p-5">
+    <GlassSurface className="card p-4 sm:p-5">
       <SectionHeader
         icon={Calendar}
         title="学习热力图"
@@ -224,7 +225,7 @@ export function Heatmap({ logs, days = 365 }: HeatmapProps) {
           </AnimatePresence>
         </>
       )}
-    </section>
+    </GlassSurface>
   );
 }
 

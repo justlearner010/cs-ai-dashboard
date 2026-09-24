@@ -3,6 +3,7 @@ import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import type { Course, LogEntry } from '../types';
 import { computeStreak, dueWindow, today } from '../utils/helpers';
 import { MOTION } from '../motion/tokens';
+import { GlassSurface } from './glass/GlassSurface';
 
 /**
  * 签名时刻（T5）：今日通关粒子庆祝 + streak 里程碑火焰庆祝。
@@ -97,8 +98,8 @@ function MomentOverlay({
             : MOTION.spring.celebrate
         }
         data-static={reduceMotion ? '' : undefined}
-        className="glass-strong rounded-2xl px-8 py-6 text-center"
       >
+        <GlassSurface className="glass-strong rounded-2xl px-8 py-6 text-center">
         <div className="text-4xl mb-2" aria-hidden>
           {isClear ? '🎉' : '🔥'}
         </div>
@@ -109,6 +110,7 @@ function MomentOverlay({
             已按系统「减少动态效果」设置播放静态提示
           </p>
         )}
+        </GlassSurface>
       </motion.div>
     </div>
   );

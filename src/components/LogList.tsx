@@ -6,6 +6,7 @@ import { moodLabel, smoothScrollTo } from '../utils/helpers';
 import { EmptyState } from './EmptyState';
 import { SectionHeader } from './SectionHeader';
 import { MOTION } from '../motion/tokens';
+import { GlassSurface } from './glass/GlassSurface';
 
 interface LogListProps {
   courses: Course[];
@@ -67,7 +68,7 @@ export function LogList({ courses, logs, onEdit, onDelete, onBatchDelete }: LogL
   };
 
   return (
-    <section className="card p-4 sm:p-5">
+    <GlassSurface className="card p-4 sm:p-5">
       <SectionHeader
         icon={History}
         title="学习日志"
@@ -184,7 +185,7 @@ export function LogList({ courses, logs, onEdit, onDelete, onBatchDelete }: LogL
           </AnimatePresence>
         )}
       </div>
-    </section>
+    </GlassSurface>
   );
 }
 

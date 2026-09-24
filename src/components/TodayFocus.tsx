@@ -18,6 +18,7 @@ import { reminderSupported } from '../hooks/useTaskReminders';
 import { downloadFeishuSync } from '../utils/feishuSync';
 import { MOTION } from '../motion/tokens';
 import { SectionHeader } from './SectionHeader';
+import { GlassSurface } from './glass/GlassSurface';
 
 interface FocusItem {
   todo: Todo;
@@ -247,7 +248,7 @@ export function TodayFocus({
   });
 
   return (
-    <div className="card p-4 sm:p-5">
+    <GlassSurface className="card p-4 sm:p-5">
       <SectionHeader
         icon={Target}
         title="今日焦点"
@@ -366,6 +367,6 @@ export function TodayFocus({
           创建飞书待办
         </p>
       )}
-    </div>
+    </GlassSurface>
   );
 }

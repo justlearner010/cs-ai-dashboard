@@ -3,6 +3,7 @@ import type { Course, LogEntry } from '../types';
 import { overallProgress, computeStreak, totalHours } from '../utils/helpers';
 import { useAnimatedNumber } from '../hooks/useAnimatedNumber';
 import { staggerStyle } from '../motion/tokens';
+import { GlassSurface } from './glass/GlassSurface';
 
 interface StatsCardsProps {
   courses: Course[];
@@ -59,8 +60,9 @@ export function StatsCards({ courses, logs }: StatsCardsProps) {
       {items.map((item, index) => {
         const Icon = item.icon;
         return (
-          <div
+          <GlassSurface
             key={index}
+            display="flex"
             className="card p-3 sm:p-4 flex items-center gap-3 sm:gap-4"
             style={staggerStyle(index)}
           >
@@ -73,7 +75,7 @@ export function StatsCards({ courses, logs }: StatsCardsProps) {
                 {item.value}
               </p>
             </div>
-          </div>
+          </GlassSurface>
         );
       })}
     </section>
