@@ -60,13 +60,13 @@ export function ThemeBackground() {
  */
 export function MyGoHero() {
   return (
-    <div className="card relative overflow-hidden">
+    <div className="card relative overflow-hidden p-2">
       <img
         src={`${import.meta.env.BASE_URL}MyGO!!!!!_10th_anniversary_kv_banner_v2.webp`}
         alt="MyGO!!!!! 角色图（官方素材）"
         width={1600}
         height={700}
-        className="w-full h-auto block object-contain"
+        className="w-full h-auto block object-contain rounded"
         loading="eager"
         draggable={false}
         onError={e => { e.currentTarget.parentElement!.style.display = 'none' }}

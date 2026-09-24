@@ -17,6 +17,7 @@ import { TodayFocus } from "./components/TodayFocus";
 import { useTaskReminders } from "./hooks/useTaskReminders";
 import { useToast } from "./hooks/useToast";
 import { ThemeBackground, MyGoHero } from "./components/ThemeBackground";
+import { GlassDefs } from "./components/glass/GlassDefs";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { LazySectionFallback } from "./components/LazyLoad";
 import { today, uuid, overallProgress, smoothScrollTo } from "./utils/helpers";
@@ -273,6 +274,13 @@ export default function App() {
       window.removeEventListener("pointermove", onPointerMove);
       if (raf) cancelAnimationFrame(raf);
     };
+  }, []);
+
+  // Firefox 对 filter 内 feImage data-uri 位移支持不可靠：关折射，只留基础模糊
+  useEffect(() => {
+    if (navigator.userAgent.toLowerCase().includes("firefox")) {
+      document.documentElement.dataset.engine = "gecko";
+    }
   }, []);
 
   const handleToggleTodo = useCallback(
@@ -555,6 +563,7 @@ export default function App() {
     // load-in 挂在 Header 与布局容器上（不含 ScrollProgress/MobileNav/BackToTop 等
     // fixed 元素）：根节点带 transform 期间会成为 fixed 的包含块，首屏把底栏拉出视口
     <div className="min-h-screen pb-20 relative">
+      <GlassDefs />
       <ThemeBackground />
       <ScrollProgress />
       <Header
