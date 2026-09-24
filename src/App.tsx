@@ -249,6 +249,32 @@ export default function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // 玻璃指针追光：光源坐标写入 CSS 变量（约 25fps 节流，避免玻璃层逐帧重绘）
+  useEffect(() => {
+    const fine = window.matchMedia("(hover: hover) and (pointer: fine)");
+    if (!fine.matches || window.matchMedia("(prefers-reduced-motion: reduce)").matches)
+      return;
+    let raf = 0;
+    let last = 0;
+    const onPointerMove = (e: PointerEvent) => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        const now = performance.now();
+        if (now - last < 40) return;
+        last = now;
+        const root = document.documentElement;
+        root.style.setProperty("--glass-light-x", `${e.clientX}px`);
+        root.style.setProperty("--glass-light-y", `${e.clientY}px`);
+      });
+    };
+    window.addEventListener("pointermove", onPointerMove, { passive: true });
+    return () => {
+      window.removeEventListener("pointermove", onPointerMove);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
+
   const handleToggleTodo = useCallback(
     (courseId: string, todoId: string) => {
       const course = courses.find((c) => c.id === courseId);
