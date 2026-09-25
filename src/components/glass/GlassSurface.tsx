@@ -9,12 +9,38 @@ export function GlassThemeProvider({ value, children }: { value: boolean; childr
 }
 
 /**
- * 浅色底近乎纯白，折射无信号：提折射强度/色散、降磨砂让极光透上来；
- * 暗色沿用 v2 校准（frost 12 / saturate 1.7），折射参数走库默认。
+ * iOS 26 质感预设（rim 优先：厚唇缘 + 镜面带 + 色散，中心保持平静）。
+ * 浅色底近纯白，折射无信号：提折射强度/色散、降磨砂让极光透上来；
+ * 暗色沿用 v2 校准的 frost/saturate，其余与浅色同构（specular 略高，暗色镜面更抓眼）。
+ * 库 material 模式自带 bend 0.45 / sheen 0.32 / specular 1 底子，这里是往 Apple 观感再推一档。
  */
+const IOS26_COMMON = {
+  bend: 0.6,
+  bendWidth: 0.14,
+  sheen: 0.55,
+  sheenWidth: 5,
+  sheenAngle: 45,
+  glow: 0.15,
+} satisfies NonNullable<GlassProps["optics"]>;
+
 const OPTICS_BY_THEME = {
-  light: { frost: 10, saturate: 1.7, strength: 0.075, dispersion: 0.45 },
-  dark: { frost: 12, saturate: 1.7 },
+  light: {
+    ...IOS26_COMMON,
+    frost: 10,
+    saturate: 1.7,
+    strength: 0.085,
+    dispersion: 0.55,
+    specular: 1.4,
+  },
+  dark: {
+    ...IOS26_COMMON,
+    frost: 12,
+    saturate: 1.7,
+    strength: 0.08,
+    dispersion: 0.5,
+    specular: 1.45,
+    glow: 0.16,
+  },
 } satisfies Record<string, NonNullable<GlassProps["optics"]>>;
 
 type GlassSurfaceProps = GlassProps & {
