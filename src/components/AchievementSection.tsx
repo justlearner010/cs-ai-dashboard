@@ -12,6 +12,17 @@ import {
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { useAnimatedNumber } from '../hooks/useAnimatedNumber';
 import { staggerStyle, MOTION } from '../motion/tokens';
+import {
+  buildRpgCatalog,
+  buildDungeons,
+  resolveLoadout,
+  parseLoadout,
+  RPG_LOADOUT_KEY,
+} from '../utils/rpg';
+import type { RpgItem, Slot } from '../utils/rpg';
+import { AvatarFigure } from './AvatarFigure';
+import { EquipmentPanel, EquipmentSlots } from './EquipmentPanel';
+import { DungeonPanel } from './DungeonPanel';
 import { SectionHeader } from './SectionHeader';
 
 interface AchievementSectionProps {
@@ -64,6 +75,38 @@ export function AchievementSection({ courses, logs }: AchievementSectionProps) {
     [growth],
   );
 
+  const catalog = useMemo(() => buildRpgCatalog(courses), [courses]);
+  const dungeons = useMemo(() => buildDungeons(courses), [courses]);
+  const doneIds = useMemo(() => {
+    const s = new Set<string>();
+    for (const c of courses) for (const t of c.todos) if (t.done) s.add(t.id);
+    return s;
+  }, [courses]);
+  const validEquipIds = useMemo(
+    () => new Set(catalog.filter(i => i.kind === 'equipment' && doneIds.has(i.id)).map(i => i.id)),
+    [catalog, doneIds],
+  );
+  const [loadout, setLoadout] = useLocalStorage<Partial<Record<Slot, string>>>(
+    RPG_LOADOUT_KEY,
+    {},
+    { parse: parseLoadout },
+  );
+  const resolvedLoadout = useMemo(
+    () => resolveLoadout(loadout, validEquipIds),
+    [loadout, validEquipIds],
+  );
+  const handleEquip = (item: RpgItem) => {
+    if (!item.slot) return;
+    setLoadout(prev => ({ ...prev, [item.slot as Slot]: item.id }));
+  };
+  const handleUnequip = (slot: Slot) => {
+    setLoadout(prev => {
+      const next = { ...prev };
+      delete next[slot];
+      return next;
+    });
+  };
+
   // 解锁 diff：key 缺失（首访/fixture clear）→ 静默回填只写时刻不公告；
   // key 存在（含 {}）才 diff 公告——快照本身就是永久抑制，不设独立抑制键
   useEffect(() => {
@@ -109,7 +152,7 @@ export function AchievementSection({ courses, logs }: AchievementSectionProps) {
     <section className="card p-4 sm:p-5">
       <SectionHeader
         icon={Trophy}
-        title="成长成就"
+        title="成长图鉴"
         muted={
           <span className="text-xs text-slate-600 dark:text-slate-400">
             {unlockedCount}/{ACHIEVEMENTS.length} 已解锁
@@ -147,42 +190,70 @@ export function AchievementSection({ courses, logs }: AchievementSectionProps) {
         )}
       </AnimatePresence>
 
-      <div
-        className="mb-4 p-4 rounded-xl glass-subtle flex flex-col sm:flex-row sm:items-center gap-4"
-        data-testid="achievement-level"
-      >
-        <div className="flex items-baseline gap-2 shrink-0">
-          <span className="text-xs text-slate-600 dark:text-slate-400">Lv</span>
-          <span className="text-3xl font-bold text-slate-900 dark:text-slate-100 tabular-nums">
-            {animatedLevel}
-          </span>
+      <div className="grid md:grid-cols-[auto_1fr] gap-4 mb-4">
+        <div
+          data-testid="rpg-avatar"
+          className="flex flex-col items-center justify-center gap-2 p-3 rounded-xl glass-subtle"
+        >
+          <AvatarFigure level={growth.level} />
           <span className="px-2 py-0.5 rounded-full bg-brand-100/80 dark:bg-brand-900/40 text-xs font-medium text-brand-700 dark:text-brand-300">
             {growth.title}
           </span>
         </div>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center justify-between text-xs text-slate-600 dark:text-slate-400 mb-1.5">
-            <span className="tabular-nums">XP {growth.xp}</span>
-            <span className="tabular-nums">
-              {remain > 0 ? `距下一级还差 ${remain} XP` : '已到当前满级曲线顶端'}
-            </span>
-          </div>
+        <div className="flex flex-col gap-3 justify-center min-w-0">
           <div
-            className="h-2.5 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden"
-            role="progressbar"
-            aria-valuenow={Math.round(barPct)}
-            aria-valuemin={0}
-            aria-valuemax={100}
-            aria-label="等级进度"
+            className="p-4 rounded-xl glass-subtle flex flex-col sm:flex-row sm:items-center gap-4"
+            data-testid="achievement-level"
           >
-            <motion.div
-              className="h-full rounded-full bg-brand-500"
-              initial={{ width: 0 }}
-              animate={{ width: `${barPct}%` }}
-              transition={{ duration: MOTION.duration.draw / 1000, ease: MOTION.ease.out }}
-            />
+            <div className="flex items-baseline gap-2 shrink-0">
+              <span className="text-xs text-slate-600 dark:text-slate-400">Lv</span>
+              <span className="text-3xl font-bold text-slate-900 dark:text-slate-100 tabular-nums">
+                {animatedLevel}
+              </span>
+              <span className="px-2 py-0.5 rounded-full bg-brand-100/80 dark:bg-brand-900/40 text-xs font-medium text-brand-700 dark:text-brand-300">
+                {growth.title}
+              </span>
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center justify-between text-xs text-slate-600 dark:text-slate-400 mb-1.5">
+                <span className="tabular-nums">XP {growth.xp}</span>
+                <span className="tabular-nums">
+                  {remain > 0 ? `距下一级还差 ${remain} XP` : '已到当前满级曲线顶端'}
+                </span>
+              </div>
+              <div
+                className="h-2.5 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden"
+                role="progressbar"
+                aria-valuenow={Math.round(barPct)}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-label="等级进度"
+              >
+                <motion.div
+                  className="h-full rounded-full bg-brand-500"
+                  initial={{ width: 0 }}
+                  animate={{ width: `${barPct}%` }}
+                  transition={{ duration: MOTION.duration.draw / 1000, ease: MOTION.ease.out }}
+                />
+              </div>
+            </div>
           </div>
+          <EquipmentSlots
+            catalog={catalog}
+            loadout={resolvedLoadout}
+            onUnequip={handleUnequip}
+          />
         </div>
+      </div>
+
+      <div className="grid lg:grid-cols-2 gap-4 mb-4">
+        <EquipmentPanel
+          catalog={catalog}
+          doneIds={doneIds}
+          loadout={resolvedLoadout}
+          onEquip={handleEquip}
+        />
+        <DungeonPanel dungeons={dungeons} />
       </div>
 
       <div

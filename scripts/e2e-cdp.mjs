@@ -546,6 +546,81 @@ async function main() {
       assert(snap2['first-task'] === ts, '刷新后解锁时间戳不变');
     });
 
+    // ——— RPG 成长 ———
+    await test('rpg：空数据 → 头像 + 5 槽 + 背包空态 + loadout 缺失不报错', async () => {
+      await loadFixture({ courses: makeCourse([makeTodo()]), logs: [] });
+      await waitForExpr(hasTest('rpg-avatar'), { timeout: 8000 });
+      const info = await evalExpr(`(() => {
+        const slots = document.querySelector('[data-testid="rpg-slots"]');
+        const inv = document.querySelector('[data-testid="rpg-inventory"]');
+        return {
+          avatarSvg: !!document.querySelector('[data-testid="rpg-avatar"] svg'),
+          slotCount: slots ? slots.querySelectorAll('[data-testid^="rpg-slot-"]').length : 0,
+          count: document.querySelector('[data-testid="rpg-inventory-count"]')?.textContent ?? '',
+          empty: inv ? inv.textContent.includes('完成 knowledge 任务') : false,
+          dungeonToggle: !!document.querySelector('[data-testid="rpg-dungeon-toggle"]'),
+        };
+      })()`);
+      assert(
+        info.avatarSvg && info.slotCount === 5 && info.dungeonToggle,
+        `头像 svg + 5 槽 + 副本切换（${JSON.stringify(info)}）`,
+      );
+      assert(info.empty && info.count.startsWith('0/'), `背包空态 0/（${JSON.stringify(info)}）`);
+      const loadout = await readLocalStorage('csAiAgentRpgLoadout');
+      assert(loadout === null, `fixture clear 后 loadout key 缺失不报错（实际 ${loadout}）`);
+    });
+
+    await test('rpg：完成 knowledge 任务 → 背包物品计数 +1', async () => {
+      const text = 'RPG 掉落任务';
+      await loadFixture({ courses: makeCourse([makeTodo({ text })]), logs: [] });
+      await waitForExpr(hasTest('rpg-inventory-count'), { timeout: 8000 });
+      const before = await evalExpr(
+        `Number(document.querySelector('[data-testid="rpg-inventory-count"]').textContent.split('/')[0])`,
+      );
+      await clickCheckboxByLabel(text);
+      await waitForExpr(
+        `Number(document.querySelector('[data-testid="rpg-inventory-count"]').textContent.split('/')[0]) === ${before + 1}`,
+        { timeout: 4000 },
+      );
+      assert(true, `计数 ${before} → ${before + 1}`);
+    });
+
+    await test('rpg：背包点穿 → loadout 写入 + 槽位显示；点槽卸下 → 清空为 {}', async () => {
+      const text = 'RPG 装备任务';
+      await loadFixture({ courses: makeCourse([makeTodo({ text })]), logs: [] });
+      await waitForExpr(hasTest('rpg-inventory'), { timeout: 8000 });
+      await clickCheckboxByLabel(text);
+      await waitForExpr(
+        `!!document.querySelector('[data-testid="rpg-inventory"] button[aria-label^="装备"]')`,
+        { timeout: 4000 },
+      );
+      const name = await evalExpr(`(() => {
+        const btn = document.querySelector('[data-testid="rpg-inventory"] button[aria-label^="装备"]');
+        const label = btn.getAttribute('aria-label');
+        btn.click();
+        return label.slice('装备'.length);
+      })()`);
+      await waitForExpr(`localStorage.getItem('csAiAgentRpgLoadout') !== null`, { timeout: 4000 });
+      const loadout = JSON.parse((await readLocalStorage('csAiAgentRpgLoadout')) ?? '{}');
+      const slot = Object.keys(loadout)[0];
+      assert(slot && loadout[slot], `loadout 写入（实际 ${JSON.stringify(loadout)}）`);
+
+      const slotSel = `[data-testid="rpg-slot-${slot}"]`;
+      await waitForExpr(
+        `(() => { const el = document.querySelector(${JSON.stringify(slotSel)}); return !!el && el.textContent.includes(${JSON.stringify(name)}); })()`,
+        { timeout: 4000 },
+      );
+      await evalExpr(`document.querySelector(${JSON.stringify(slotSel)}).click(); true`);
+      await waitForExpr(
+        `localStorage.getItem('csAiAgentRpgLoadout') === '{}'`,
+        { timeout: 4000 },
+      );
+      const slotText = await evalExpr(
+        `document.querySelector(${JSON.stringify(slotSel)}).textContent`,
+      );
+      assert(!slotText.includes(name), `卸下后槽位不再显示物品（${slotText}）`);
+    });
+
     // ——— 汇总 ———
     failures = results.filter(r => !r.ok).length;
     console.log(`\n${results.length - failures}/${results.length} 通过`);
