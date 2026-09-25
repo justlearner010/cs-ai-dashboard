@@ -10,4 +10,4 @@ Default five-role vocabulary (`needs-triage`, `needs-info`, `ready-for-agent`, `
 
 ### Domain docs
 
-Single-context: `CONTEXT.md` and `docs/adr/` live at the repo root. See `docs/agents/domain.md`.
+Single-context: `CONTEXT.md` and `docs/adr/` at the repo root are created lazily by domain modeling — they may not exist yet (proceed silently if absent). Consumption rules: `docs/agents/domain.md`.

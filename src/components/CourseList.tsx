@@ -5,6 +5,7 @@ import { CourseCard } from './CourseCard';
 import { EmptyState } from './EmptyState';
 import { SectionHeader } from './SectionHeader';
 import { staggerStyle } from '../motion/tokens';
+import { useLocalStorage } from '../hooks/useLocalStorage';
 
 interface CourseListProps {
   courses: Course[];
@@ -15,6 +16,14 @@ interface CourseListProps {
   onReorderTodos: (courseId: string, newTodos: Todo[]) => void;
   onHighlightDimension?: (dimension: string | null) => void;
 }
+
+const statusFilters = [
+  { key: 'all', label: '全部' },
+  { key: 'doing', label: '进行中' },
+  { key: 'todo', label: '未开始' },
+] as const;
+
+type StatusFilter = (typeof statusFilters)[number]['key'];
 
 export function CourseList({
   courses,
@@ -27,13 +36,27 @@ export function CourseList({
 }: CourseListProps) {
   const [query, setQuery] = useState('');
   const [phase, setPhase] = useState('');
+  const [status, setStatus] = useState<StatusFilter>('all');
+  // 折叠态默认 {} = 全展开（e2e 需要勾选框常驻 DOM）；用户手动折叠后跨刷新保留
+  const [collapsedMap, setCollapsedMap] = useLocalStorage<Record<string, boolean>>(
+    'csAiAgentCourseFold',
+    {},
+  );
   const phases = useMemo(() => [...new Set(courses.map(c => c.phase))], [courses]);
   const q = query.trim().toLowerCase();
   const visible = courses.filter(c => {
     if (phase && c.phase !== phase) return false;
+    if (status !== 'all') {
+      const started = c.todos.some(t => t.done);
+      if (status === 'doing' && !started) return false;
+      if (status === 'todo' && started) return false;
+    }
     if (!q) return true;
     return `${c.name} ${c.fullName} ${c.id} ${c.skills.join(' ')}`.toLowerCase().includes(q);
   });
+
+  const toggleCollapse = (courseId: string) =>
+    setCollapsedMap(prev => ({ ...prev, [courseId]: !prev[courseId] }));
 
   return (
     <section className="card p-4 sm:p-5">
@@ -68,6 +91,22 @@ export function CourseList({
             <option key={p} value={p}>{p}</option>
           ))}
         </select>
+        <div className="flex gap-2 flex-wrap" role="group" aria-label="按状态筛选课程">
+          {statusFilters.map(f => (
+            <button
+              key={f.key}
+              onClick={() => setStatus(f.key)}
+              aria-pressed={status === f.key}
+              className={`pill cursor-pointer border px-3 py-1.5 transition-colors ${
+                status === f.key
+                  ? 'bg-brand-100 text-brand-700 border-brand-200 dark:bg-brand-900/40 dark:text-brand-300 dark:border-brand-800'
+                  : 'bg-white/60 text-slate-500 border-white/70 hover:bg-white dark:bg-slate-800/50 dark:text-slate-400 dark:border-slate-700'
+              }`}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
       </div>
       {visible.length === 0 ? (
         <EmptyState
@@ -79,6 +118,7 @@ export function CourseList({
             onClick: () => {
               setQuery('');
               setPhase('');
+              setStatus('all');
             },
           }}
         />
@@ -88,6 +128,8 @@ export function CourseList({
             <div key={course.id} style={staggerStyle(index)}>
               <CourseCard
                 course={course}
+                collapsed={!!collapsedMap[course.id]}
+                onToggleCollapse={toggleCollapse}
                 onToggleTodo={onToggleTodo}
                 onAddTodo={onAddTodo}
                 onDeleteTodo={onDeleteTodo}

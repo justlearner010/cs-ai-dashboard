@@ -18,6 +18,7 @@ interface LogListProps {
 export function LogList({ courses, logs, onEdit, onDelete, onBatchDelete }: LogListProps) {
   const [filter, setFilter] = useState('');
   const [query, setQuery] = useState('');
+  const [onlyQuestions, setOnlyQuestions] = useState(false);
   const [isBatchMode, setIsBatchMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
@@ -26,15 +27,16 @@ export function LogList({ courses, logs, onEdit, onDelete, onBatchDelete }: LogL
     const list = logs.filter(l => {
       // 与 DailyLogForm 存储格式一致的全串精确匹配（phase — name）
       if (filter && l.course !== filter) return false;
+      if (onlyQuestions && !(l.questions ?? '').trim()) return false;
       if (!q) return true;
       return [l.course, l.date, l.knowledge, l.lab, l.questions, l.reflection].some(
         v => (v ?? '').toLowerCase().includes(q),
       );
     });
     return [...list].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-  }, [logs, filter, query]);
+  }, [logs, filter, query, onlyQuestions]);
 
-  const hasCriteria = Boolean(filter || query.trim());
+  const hasCriteria = Boolean(filter || query.trim() || onlyQuestions);
 
   const toggleSelection = (id: string) => {
     setSelectedIds(prev => {
@@ -115,6 +117,21 @@ export function LogList({ courses, logs, onEdit, onDelete, onBatchDelete }: LogL
                 <CheckSquare className="w-3.5 h-3.5" /> 批量管理
               </button>
             )}
+            <button
+              onClick={() => {
+                setOnlyQuestions(v => !v);
+                setSelectedIds(new Set());
+              }}
+              aria-pressed={onlyQuestions}
+              title="只显示记录了问题反馈的日志"
+              className={`pill cursor-pointer border transition-colors ${
+                onlyQuestions
+                  ? 'bg-brand-100 text-brand-700 border-brand-200 dark:bg-brand-900/40 dark:text-brand-300 dark:border-brand-800'
+                  : 'bg-white/60 text-slate-500 border-white/70 hover:bg-white dark:bg-slate-800/50 dark:text-slate-400 dark:border-slate-700'
+              }`}
+            >
+              只看问题反馈
+            </button>
             <input
               type="search"
               value={query}

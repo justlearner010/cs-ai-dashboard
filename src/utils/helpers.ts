@@ -15,14 +15,6 @@ export function escapeHtml(text: string): string {
   return div.innerHTML;
 }
 
-export function phaseProgress(courses: Course[], phase: string): number {
-  const list = courses.filter(c => c.phase === phase);
-  if (!list.length) return 0;
-  const total = list.reduce((s, c) => s + c.todos.length, 0);
-  const done = list.reduce((s, c) => s + c.todos.filter(t => t.done).length, 0);
-  return total ? Math.round((done / total) * 100) : 0;
-}
-
 export function overallProgress(courses: Course[]): { pct: number; done: number; total: number } {
   const all = courses.flatMap(c => c.todos);
   const done = all.filter(t => t.done).length;
@@ -101,6 +93,76 @@ export function computeStreak(logs: LogEntry[]): number {
 
 export function totalHours(logs: LogEntry[]): number {
   return logs.reduce((s, l) => s + (Number(l.hours) || 0), 0);
+}
+
+/** 焦点行数据形状（今日焦点到期组 / 兜底组 / 下一步建议共用） */
+export interface FocusItem {
+  todo: Todo;
+  course: Course;
+}
+
+/** log ↔ 课程关联键：与 DailyLogForm 写日志、LogList 课程过滤同一口径 */
+function courseLogKey(course: Course): string {
+  return `${course.phase} — ${course.name}`;
+}
+
+/** 近 7 天有日志的课程按最近日志日期降序在前，其余保持数组原序 */
+function rankCourses(courses: Course[], logs: LogEntry[]): Course[] {
+  const end = today();
+  const startObj = parseLocalDate(end);
+  startObj.setDate(startObj.getDate() - 6);
+  const pad = (n: number) => String(n).padStart(2, '0');
+  const start = `${startObj.getFullYear()}-${pad(startObj.getMonth() + 1)}-${pad(startObj.getDate())}`;
+  const latest = new Map<string, string>();
+  for (const l of logs) {
+    if (l.date < start || l.date > end) continue;
+    const cur = latest.get(l.course);
+    if (!cur || l.date > cur) latest.set(l.course, l.date);
+  }
+  return courses
+    .map((course, index) => ({ course, index, last: latest.get(courseLogKey(course)) }))
+    .sort((a, b) => {
+      if (a.last && b.last) return b.last.localeCompare(a.last) || a.index - b.index;
+      if (a.last) return -1;
+      if (b.last) return 1;
+      return a.index - b.index;
+    })
+    .map(x => x.course);
+}
+
+function prereqsOk(course: Course, byId: Map<string, Course>): boolean {
+  return course.prerequisites.every(pid => {
+    const pre = byId.get(pid);
+    return !pre || pre.todos.every(t => t.done);
+  });
+}
+
+/**
+ * 下一步建议：近 7 天活跃课程优先；先取先修已满足的首个未完成任务，
+ * 全都不满足时放开先修约束兜底。
+ */
+export function findNextStep(courses: Course[], logs: LogEntry[]): FocusItem | null {
+  const ranked = rankCourses(courses, logs);
+  const byId = new Map(courses.map(c => [c.id, c]));
+  for (const strict of [true, false]) {
+    for (const course of ranked) {
+      const todo = course.todos.find(t => !t.done);
+      if (!todo) continue;
+      if (!strict || prereqsOk(course, byId)) return { todo, course };
+    }
+  }
+  return null;
+}
+
+/** 今日焦点兜底组：沿 ranked 序每门课取首个未完成任务，凑满 limit 项 */
+export function pickNextItems(courses: Course[], logs: LogEntry[], limit = 5): FocusItem[] {
+  const out: FocusItem[] = [];
+  for (const course of rankCourses(courses, logs)) {
+    const todo = course.todos.find(t => !t.done);
+    if (todo) out.push({ todo, course });
+    if (out.length >= limit) break;
+  }
+  return out;
 }
 
 export function progressColor(pct: number): string {
