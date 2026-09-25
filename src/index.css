@@ -62,29 +62,30 @@
      卡内嵌套面板、按钮、徽章一律半透明填充 + 边框，不开 blur。
      掉帧时先将 StatsCards 四块降为 .glass-subtle。 */
 
-  /* ——— 玻璃材质 v2（折射）———
-     ① 厚度光：background-image 顶亮渐变（背景色单独保留 → 暗色切换仍可过渡）
-     ② 双色 rim：顶/左高光边 + 底/右接触影边 + inset 镜面线
-     ③ 边缘折射：::before(z:-1) 单次 backdrop 采样，
-        filter url(#glass-warp) 做位移图边缘位移（思路源自 rdev/liquid-glass-react，
-        色散/variable blur 经像素探针证实 Chrome 下压暗亮色与放大发白暗色，已移除）；
-        Firefox 降级无折射
-     ④ 颗粒烘进 ::after alpha（随元素滚动）+ 指针追光（视口固定，仅精细指针） */
+  /* ——— 玻璃材质 W4（@taha_kadhim/liquid-glass，WebGL 真折射）———
+     ① 卡面（.card）：GlassSurface 按 tier 承担折射——
+        Chromium+WebGL2 → 每卡一个 GL 面，backdrop = 极光纹理裁剪
+        （auroraTexture 供色，shader 内做 SDF 位移/色散/唇缘光）；
+        其余浏览器/无 backdrop 源 → 库自动落 svg/blur live tier（采样真实页面）
+     ② chrome 面（.glass-strong：Header/MobileNav/Toast/Modal）：不供纹理，
+        恒走 live svg/blur tier（backdrop-filter: url(#lg-filter-*)，零 GL context）
+     ③ CSS 只管皮：半透明底 + 发丝边 + 阴影 + 颗粒；
+        指针追光仅留给 live tier（WebGL 卡由 shader 的 interactive 光承担，
+        避免双光源 → .glass-shader-light 排除） */
 
   /* L3 强玻璃：sticky chrome（Header / MobileNav / Toast / BackupModal） */
   .glass-strong {
     position: relative;
-    isolation: isolate;
-    background-color: rgba(255, 255, 255, 0.72);
+    background-color: rgba(255, 255, 255, 0.64);
     background-image: linear-gradient(165deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 52%);
     border: 1px solid transparent;
     border-top-color: rgba(255, 255, 255, 0.95);
     border-left-color: rgba(255, 255, 255, 0.75);
-    border-bottom-color: rgba(15, 23, 42, 0.07);
-    border-right-color: rgba(15, 23, 42, 0.05);
+    border-bottom-color: rgba(15, 23, 42, 0.12);
+    border-right-color: rgba(15, 23, 42, 0.09);
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.95),
-      inset 0 -1px 0 rgba(15, 23, 42, 0.05),
+      inset 0 -1px 0 rgba(15, 23, 42, 0.08),
       0 1px 2px rgba(15, 23, 42, 0.04),
       0 12px 32px -12px rgba(15, 23, 42, 0.14);
   }
@@ -101,21 +102,20 @@
       0 12px 32px -12px rgba(0, 0, 0, 0.55);
   }
 
-  /* L2 主玻璃：顶层卡片（类名 .card 保持不变；blur 在 ::before 上） */
+  /* L2 主玻璃：顶层卡片（类名 .card 保持不变；折射在 Glass 根上，CSS 只管皮） */
   .card {
     position: relative;
-    isolation: isolate;
-    background-color: rgba(255, 255, 255, 0.58);
+    background-color: rgba(255, 255, 255, 0.5);
     background-image: linear-gradient(165deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 50%);
     border: 1px solid transparent;
     border-top-color: rgba(255, 255, 255, 0.95);
     border-left-color: rgba(255, 255, 255, 0.7);
-    border-bottom-color: rgba(15, 23, 42, 0.06);
-    border-right-color: rgba(15, 23, 42, 0.05);
+    border-bottom-color: rgba(15, 23, 42, 0.11);
+    border-right-color: rgba(15, 23, 42, 0.09);
     border-radius: 0.75rem;
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.85),
-      inset 0 -1px 0 rgba(15, 23, 42, 0.04),
+      inset 0 -1px 0 rgba(15, 23, 42, 0.07),
       0 1px 2px rgba(15, 23, 42, 0.03),
       0 8px 24px -8px rgba(15, 23, 42, 0.08);
     transition:
@@ -148,31 +148,6 @@
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
   }
 
-  /* 折射层：单次 backdrop 采样放 ::before(z:-1)（isolation 圈在卡内），
-     filter url(#glass-warp) 做位移图边缘折射；内容在其上保持锐利 */
-  .card::before,
-  .glass-strong::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    border-radius: inherit;
-    pointer-events: none;
-    -webkit-backdrop-filter: blur(12px) saturate(170%) brightness(1.04);
-    backdrop-filter: blur(12px) saturate(170%) brightness(1.04);
-    filter: url(#glass-warp);
-  }
-  .dark .card::before,
-  .dark .glass-strong::before {
-    -webkit-backdrop-filter: blur(14px) saturate(180%) brightness(1.02);
-    backdrop-filter: blur(14px) saturate(180%) brightness(1.02);
-  }
-  /* Firefox：feImage data-uri 位移不可靠 → 关折射留基础模糊 */
-  [data-engine="gecko"] .card::before,
-  [data-engine="gecko"] .glass-strong::before {
-    filter: none;
-  }
-
   /* 颗粒（alpha 烘焙，随元素滚动）铺底；细指针设备叠加视口固定的指针追光 */
   .card::after,
   .glass-strong::after {
@@ -185,16 +160,15 @@
     background-attachment: scroll;
     transition: box-shadow var(--motion-slow) var(--motion-ease);
   }
-  /* 1px inset 镜面线放 ::after：z:-1 的 ::before（不透明采样）会盖掉元素自身的 inset 阴影 */
   .card::after {
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.85),
-      inset 0 -1px 0 rgba(15, 23, 42, 0.04);
+      inset 0 -1px 0 rgba(15, 23, 42, 0.07);
   }
   .glass-strong::after {
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.95),
-      inset 0 -1px 0 rgba(15, 23, 42, 0.05);
+      inset 0 -1px 0 rgba(15, 23, 42, 0.08);
   }
   .dark .card::after {
     box-shadow:
@@ -207,8 +181,9 @@
       inset 0 -1px 0 rgba(0, 0, 0, 0.35);
   }
   @media (hover: hover) and (pointer: fine) {
-    .card::after,
-    .glass-strong::after {
+    /* .glass-shader-light = WebGL 卡面（shader interactive 光已追踪指针）→ 排除，避免双光源 */
+    .glass-strong::after,
+    .card:not(.glass-shader-light)::after {
       background-image:
         url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.055'/%3E%3C/svg%3E"),
         radial-gradient(
@@ -218,8 +193,8 @@
         );
       background-attachment: scroll, fixed;
     }
-    .dark .card::after,
-    .dark .glass-strong::after {
+    .dark .glass-strong::after,
+    .dark .card:not(.glass-shader-light)::after {
       background-image:
         url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.055'/%3E%3C/svg%3E"),
         radial-gradient(

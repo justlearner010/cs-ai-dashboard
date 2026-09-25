@@ -1,6 +1,7 @@
 import { Download, Upload, Cloud, Sun, Moon } from 'lucide-react';
 import type { AppData, ImportResult } from '../types';
 import { useToast } from '../hooks/useToast';
+import { GlassSurface } from './glass/GlassSurface';
 
 interface HeaderProps {
   onExport: () => void;
@@ -44,7 +45,7 @@ export function Header({ onExport, onImport, onBackup, lastBackupAt, isDark, onT
   const needsBackup = Number.isNaN(backupTs) || Date.now() - backupTs > BACKUP_INTERVAL_MS;
 
   return (
-    <header className="glass-strong sticky top-0 z-30 transition-colors animate-load-in">
+    <GlassSurface role="banner" className="glass-strong sticky top-0 z-30 transition-colors animate-load-in">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-4">
         <div className="flex items-center gap-4 min-w-0">
           <img
@@ -105,6 +106,6 @@ export function Header({ onExport, onImport, onBackup, lastBackupAt, isDark, onT
           </label>
         </div>
       </div>
-    </header>
+    </GlassSurface>
   );
 }

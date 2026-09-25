@@ -9,6 +9,7 @@ import {
 } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { MOTION } from '../motion/tokens';
+import { GlassSurface } from '../components/glass/GlassSurface';
 
 interface ToastAction {
   label: string;
@@ -72,8 +73,11 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -6, scale: 0.97 }}
               transition={{ duration: MOTION.duration.base / 1000, ease: MOTION.ease.out }}
-              className="glass-strong flex items-center gap-3 px-4 py-3 rounded-xl text-sm"
             >
+              <GlassSurface
+                display="flex"
+                className="glass-strong flex items-center gap-3 px-4 py-3 rounded-xl text-sm"
+              >
               <span className="flex-1 leading-snug">{item.message}</span>
               {item.action && (
                 <button
@@ -87,6 +91,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                   {item.action.label}
                 </button>
               )}
+              </GlassSurface>
             </motion.div>
           ))}
         </AnimatePresence>
