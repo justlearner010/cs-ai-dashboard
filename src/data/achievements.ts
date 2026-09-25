@@ -72,7 +72,7 @@ export const ACHIEVEMENTS: Achievement[] = [
   ach({ id: 'first-task', name: '第一个脚印', desc: '完成第 1 个学习任务', icon: CheckCircle2, category: 'task', tier: 'bronze', condition: c => c.done >= 1 }),
   ach({ id: 'task-10', name: '十全十美', desc: '累计完成 10 个任务', icon: ListChecks, category: 'task', tier: 'bronze', condition: c => c.done >= 10 }),
   ach({ id: 'task-50', name: '半百里程', desc: '累计完成 50 个任务', icon: Target, category: 'task', tier: 'silver', condition: c => c.done >= 50 }),
-  ach({ id: 'task-100', name: '百 task 通关', desc: '累计完成 100 个任务', icon: Flag, category: 'task', tier: 'gold', condition: c => c.done >= 100 }),
+  ach({ id: 'task-100', name: '百项通关', desc: '累计完成 100 个任务', icon: Flag, category: 'task', tier: 'gold', condition: c => c.done >= 100 }),
   ach({ id: 'progress-25', name: '四分之一', desc: '总完成度达到 25%', icon: Percent, category: 'task', tier: 'silver', condition: c => c.total > 0 && c.pct >= 25 }),
   ach({ id: 'progress-50', name: '半程里程', desc: '总完成度达到 50%', icon: TrendingUp, category: 'task', tier: 'silver', condition: c => c.total > 0 && c.pct >= 50 }),
   ach({ id: 'progress-100', name: '全量满贯', desc: '总完成度达到 100%', icon: PartyPopper, category: 'task', tier: 'gold', condition: c => c.total > 0 && c.pct >= 100 }),

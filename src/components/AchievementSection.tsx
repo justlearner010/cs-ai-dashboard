@@ -189,6 +189,13 @@ export function AchievementSection({ courses, logs }: AchievementSectionProps) {
         className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3"
         data-testid="achievement-wall"
       >
+        {visible.length === 0 && (
+          <p className="col-span-full text-sm text-slate-500 dark:text-slate-400 py-6 text-center">
+            {filter === 'unlocked'
+              ? '还没有解锁的成就——完成任务、写下日志就能点亮它们。'
+              : '当前筛选下没有成就。'}
+          </p>
+        )}
         {visible.map((a, index) => {
           const Icon = a.icon;
           const unlockedAt = snapshot?.[a.id];
