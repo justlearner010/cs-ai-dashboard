@@ -62,20 +62,21 @@
      卡内嵌套面板、按钮、徽章一律半透明填充 + 边框，不开 blur。
      掉帧时先将 StatsCards 四块降为 .glass-subtle。 */
 
-  /* ——— 玻璃材质 v2（折射）———
+  /* ——— 玻璃材质 C（精修 CSS 毛玻璃）———
      ① 厚度光：background-image 顶亮渐变（背景色单独保留 → 暗色切换仍可过渡）
      ② 双色 rim：顶/左高光边 + 底/右接触影边 + inset 镜面线
-     ③ 边缘折射：::before(z:-1) 单次 backdrop 采样，
-        filter url(#glass-warp) 做位移图边缘位移（思路源自 rdev/liquid-glass-react，
-        色散/variable blur 经像素探针证实 Chrome 下压暗亮色与放大发白暗色，已移除）；
-        Firefox 降级无折射
-     ④ 颗粒烘进 ::after alpha（随元素滚动）+ 指针追光（视口固定，仅精细指针） */
+     ③ 磨砂：::before(z:-1) 单次 backdrop 采样 blur+saturate（重磨砂、强显色，
+        底下是 ThemeBackground 高振幅色场——玻璃透出的颜色全靠它）
+     ④ 边缘折射：同层 filter url(#glass-warp) 位移图边缘位移
+        （思路源自 rdev/liquid-glass-react，色散/variable blur 经像素探针证实
+        Chrome 下压暗亮色与放大发白暗色，已移除）；Firefox 降级无折射
+     ⑤ 颗粒烘进 ::after alpha（随元素滚动）+ 指针追光（视口固定，仅精细指针） */
 
   /* L3 强玻璃：sticky chrome（Header / MobileNav / Toast / BackupModal） */
   .glass-strong {
     position: relative;
     isolation: isolate;
-    background-color: rgba(255, 255, 255, 0.72);
+    background-color: rgba(255, 255, 255, 0.62);
     background-image: linear-gradient(165deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 52%);
     border: 1px solid transparent;
     border-top-color: rgba(255, 255, 255, 0.95);
@@ -89,7 +90,7 @@
       0 12px 32px -12px rgba(15, 23, 42, 0.14);
   }
   .dark .glass-strong {
-    background-color: rgba(13, 17, 23, 0.68);
+    background-color: rgba(13, 17, 23, 0.6);
     background-image: linear-gradient(165deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0) 52%);
     border-top-color: rgba(255, 255, 255, 0.16);
     border-left-color: rgba(255, 255, 255, 0.1);
@@ -105,14 +106,14 @@
   .card {
     position: relative;
     isolation: isolate;
-    background-color: rgba(255, 255, 255, 0.58);
-    background-image: linear-gradient(165deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 50%);
+    background-color: rgba(255, 255, 255, 0.4);
+    background-image: linear-gradient(165deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 50%);
     border: 1px solid transparent;
     border-top-color: rgba(255, 255, 255, 0.95);
     border-left-color: rgba(255, 255, 255, 0.7);
     border-bottom-color: rgba(15, 23, 42, 0.06);
     border-right-color: rgba(15, 23, 42, 0.05);
-    border-radius: 0.75rem;
+    border-radius: 1rem;
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.85),
       inset 0 -1px 0 rgba(15, 23, 42, 0.04),
@@ -124,7 +125,7 @@
       box-shadow var(--motion-base) var(--motion-ease);
   }
   .dark .card {
-    background-color: rgba(14, 17, 24, 0.6);
+    background-color: rgba(14, 17, 24, 0.54);
     background-image: linear-gradient(165deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0) 50%);
     border-top-color: rgba(255, 255, 255, 0.13);
     border-left-color: rgba(255, 255, 255, 0.08);
@@ -158,14 +159,15 @@
     z-index: -1;
     border-radius: inherit;
     pointer-events: none;
-    -webkit-backdrop-filter: blur(12px) saturate(170%) brightness(1.04);
-    backdrop-filter: blur(12px) saturate(170%) brightness(1.04);
+    /* 亮色不加 brightness：saturate 放大的色度会被 1.05x 截顶，白卡直接洗成灰白 */
+    -webkit-backdrop-filter: blur(20px) saturate(210%);
+    backdrop-filter: blur(20px) saturate(210%);
     filter: url(#glass-warp);
   }
   .dark .card::before,
   .dark .glass-strong::before {
-    -webkit-backdrop-filter: blur(14px) saturate(180%) brightness(1.02);
-    backdrop-filter: blur(14px) saturate(180%) brightness(1.02);
+    -webkit-backdrop-filter: blur(24px) saturate(200%) brightness(1.03);
+    backdrop-filter: blur(24px) saturate(200%) brightness(1.03);
   }
   /* Firefox：feImage data-uri 位移不可靠 → 关折射留基础模糊 */
   [data-engine="gecko"] .card::before,
@@ -355,7 +357,8 @@
   to { opacity: 1; transform: none; }
 }
 .animate-load-in {
-  animation: load-in 350ms var(--motion-ease) both;
+  /* backwards 而非 both：after-fill 会让 Chrome 排除 backdrop-filter 的页面采样（玻璃洗白） */
+  animation: load-in 350ms var(--motion-ease) backwards;
 }
 
 /* 错峰进场原语（staggerStyle() 消费；index * 80ms 步长来自 MOTION.stagger.step） */
