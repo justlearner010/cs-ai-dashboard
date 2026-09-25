@@ -19,6 +19,7 @@ import { useToast } from "./hooks/useToast";
 import { ThemeBackground, MyGoHero } from "./components/ThemeBackground";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { LazySectionFallback } from "./components/LazyLoad";
+import { GlassThemeProvider } from "./components/glass/GlassSurface";
 import { today, uuid, overallProgress, smoothScrollTo } from "./utils/helpers";
 import { generateBackupContent, type BackupPayload } from "./utils/backup";
 
@@ -554,6 +555,7 @@ export default function App() {
   return (
     // load-in 挂在 Header 与布局容器上（不含 ScrollProgress/MobileNav/BackToTop 等
     // fixed 元素）：根节点带 transform 期间会成为 fixed 的包含块，首屏把底栏拉出视口
+    <GlassThemeProvider value={isDark}>
     <div className="min-h-screen pb-20 relative">
       <ThemeBackground />
       <ScrollProgress />
@@ -666,5 +668,6 @@ export default function App() {
         />
       </Suspense>
     </div>
+    </GlassThemeProvider>
   );
 }

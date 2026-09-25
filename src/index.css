@@ -73,16 +73,16 @@
   /* L3 强玻璃：sticky chrome（Header / MobileNav / Toast / BackupModal） */
   .glass-strong {
     position: relative;
-    background-color: rgba(255, 255, 255, 0.72);
+    background-color: rgba(255, 255, 255, 0.64);
     background-image: linear-gradient(165deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 52%);
     border: 1px solid transparent;
     border-top-color: rgba(255, 255, 255, 0.95);
     border-left-color: rgba(255, 255, 255, 0.75);
-    border-bottom-color: rgba(15, 23, 42, 0.07);
-    border-right-color: rgba(15, 23, 42, 0.05);
+    border-bottom-color: rgba(15, 23, 42, 0.12);
+    border-right-color: rgba(15, 23, 42, 0.09);
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.95),
-      inset 0 -1px 0 rgba(15, 23, 42, 0.05),
+      inset 0 -1px 0 rgba(15, 23, 42, 0.08),
       0 1px 2px rgba(15, 23, 42, 0.04),
       0 12px 32px -12px rgba(15, 23, 42, 0.14);
   }
@@ -102,17 +102,17 @@
   /* L2 主玻璃：顶层卡片（类名 .card 保持不变；折射在 Glass 根上，CSS 只管皮） */
   .card {
     position: relative;
-    background-color: rgba(255, 255, 255, 0.58);
+    background-color: rgba(255, 255, 255, 0.5);
     background-image: linear-gradient(165deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 50%);
     border: 1px solid transparent;
     border-top-color: rgba(255, 255, 255, 0.95);
     border-left-color: rgba(255, 255, 255, 0.7);
-    border-bottom-color: rgba(15, 23, 42, 0.06);
-    border-right-color: rgba(15, 23, 42, 0.05);
+    border-bottom-color: rgba(15, 23, 42, 0.11);
+    border-right-color: rgba(15, 23, 42, 0.09);
     border-radius: 0.75rem;
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.85),
-      inset 0 -1px 0 rgba(15, 23, 42, 0.04),
+      inset 0 -1px 0 rgba(15, 23, 42, 0.07),
       0 1px 2px rgba(15, 23, 42, 0.03),
       0 8px 24px -8px rgba(15, 23, 42, 0.08);
     transition:
@@ -160,12 +160,12 @@
   .card::after {
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.85),
-      inset 0 -1px 0 rgba(15, 23, 42, 0.04);
+      inset 0 -1px 0 rgba(15, 23, 42, 0.07);
   }
   .glass-strong::after {
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.95),
-      inset 0 -1px 0 rgba(15, 23, 42, 0.05);
+      inset 0 -1px 0 rgba(15, 23, 42, 0.08);
   }
   .dark .card::after {
     box-shadow:
