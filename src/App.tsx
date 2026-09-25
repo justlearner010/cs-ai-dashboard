@@ -5,6 +5,7 @@ import { useDarkMode } from "./hooks/useDarkMode";
 import { initDefaultCourses } from "./data/courses";
 import { Header } from "./components/Header";
 import { StatsCards } from "./components/StatsCards";
+import { AchievementSection } from "./components/AchievementSection";
 import { CourseList } from "./components/CourseList";
 import { DailyLogForm } from "./components/DailyLogForm";
 import { LogList } from "./components/LogList";
@@ -591,6 +592,12 @@ export default function App() {
           <section id="section-overview" className="scroll-mt-24">
             <StatsCards courses={courses} logs={logs} />
           </section>
+
+          <ErrorBoundary>
+            <section id="section-achievements" className="scroll-mt-24">
+              <AchievementSection courses={courses} logs={logs} />
+            </section>
+          </ErrorBoundary>
 
           <Suspense fallback={<LazySectionFallback />}>
             <ErrorBoundary>

@@ -396,3 +396,24 @@
 .dark svg rect[stroke="#d6a2a2"] {
   stroke: #7a4a4a;
 }
+
+/* 成就解锁：墙卡图标脉冲（动在内层图标容器上，避开 .card backdrop-filter 动画禁令） */
+@keyframes achievement-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(208, 104, 184, 0.45);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(208, 104, 184, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(208, 104, 184, 0);
+  }
+}
+.achievement-pulse {
+  animation: achievement-pulse 0.9s ease-out 3;
+}
+@media (prefers-reduced-motion: reduce) {
+  .achievement-pulse {
+    animation: none;
+  }
+}
