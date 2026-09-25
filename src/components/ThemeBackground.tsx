@@ -1,6 +1,6 @@
 /**
  * 环境背景层（玻璃的折射基底）
- * - 中性冷灰基底 + 多层柔和径向极光光斑（静态，只栅格化一次）
+ * - 淡彩基底渐变 + 多层柔和径向极光光斑（静态，只栅格化一次）——玻璃折射的色彩依据
  * - 无漂移/浮动装饰：背景是舞台，不是演员
  *
  * 注：Logo 与角色图为官方素材，请确保仅限个人学习使用，
@@ -8,29 +8,36 @@
  */
 export function ThemeBackground() {
   return (
+    /* 基底淡彩渐变：粉→紫→蓝的全视口保底色（光斑之间的死区也透得出颜色），
+       光斑在其上做振幅峰——玻璃透出的颜色 = 保底 + 峰值 */
     <div
       aria-hidden
       className="pointer-events-none fixed inset-0 -z-10 overflow-hidden
-                 bg-gradient-to-br from-white via-[#f5f6f8] to-[#f5f6f8]
+                 bg-gradient-to-br from-[#fdeef6] via-[#f3f0fc] to-[#e7f2fd]
                  dark:bg-none dark:bg-[#0e1016]"
     >
-      {/* 亮色极光光斑（玻璃折射的色彩依据） */}
+      {/* 亮色极光光斑（玻璃折射的色彩依据）——色场要够振幅，磨砂才透得出颜色 */}
       <div className="absolute inset-0 dark:hidden">
         <div
           className="absolute -top-32 -left-32 w-[572px] h-[572px] rounded-full blur-3xl"
-          style={{ background: 'radial-gradient(circle, rgba(232,139,204,0.22), transparent 65%)' }}
+          style={{ background: 'radial-gradient(circle, rgba(232,139,204,0.5), transparent 65%)' }}
         />
         <div
           className="absolute top-1/4 -right-40 w-[528px] h-[528px] rounded-full blur-3xl"
-          style={{ background: 'radial-gradient(circle, rgba(244,182,228,0.24), transparent 65%)' }}
+          style={{ background: 'radial-gradient(circle, rgba(244,182,228,0.52), transparent 65%)' }}
         />
         <div
           className="absolute bottom-0 left-1/3 w-[660px] h-[660px] rounded-full blur-3xl"
-          style={{ background: 'radial-gradient(circle, rgba(216,180,234,0.2), transparent 70%)' }}
+          style={{ background: 'radial-gradient(circle, rgba(216,180,234,0.48), transparent 70%)' }}
         />
         <div
           className="absolute top-2/3 right-1/4 w-[462px] h-[462px] rounded-full blur-3xl"
-          style={{ background: 'radial-gradient(circle, rgba(247,211,238,0.29), transparent 70%)' }}
+          style={{ background: 'radial-gradient(circle, rgba(247,211,238,0.58), transparent 70%)' }}
+        />
+        {/* 冷蓝斑：给左上象限一个冷暖对比，磨砂里能看出色相变化 */}
+        <div
+          className="absolute top-1/3 left-1/4 w-[560px] h-[560px] rounded-full blur-3xl"
+          style={{ background: 'radial-gradient(circle, rgba(147,197,253,0.46), transparent 65%)' }}
         />
       </div>
 
@@ -38,15 +45,20 @@ export function ThemeBackground() {
       <div className="absolute inset-0 hidden dark:block">
         <div
           className="absolute -top-40 -left-32 w-[560px] h-[560px] rounded-full blur-3xl"
-          style={{ background: 'radial-gradient(circle, rgba(168,71,141,0.2), transparent 60%)' }}
+          style={{ background: 'radial-gradient(circle, rgba(168,71,141,0.3), transparent 60%)' }}
         />
         <div
           className="absolute top-1/4 -right-40 w-[500px] h-[500px] rounded-full blur-3xl"
-          style={{ background: 'radial-gradient(circle, rgba(192,83,164,0.18), transparent 60%)' }}
+          style={{ background: 'radial-gradient(circle, rgba(192,83,164,0.28), transparent 60%)' }}
         />
         <div
           className="absolute bottom-0 left-1/3 w-[620px] h-[620px] rounded-full blur-3xl"
-          style={{ background: 'radial-gradient(circle, rgba(139,108,176,0.16), transparent 65%)' }}
+          style={{ background: 'radial-gradient(circle, rgba(139,108,176,0.26), transparent 65%)' }}
+        />
+        {/* 靛蓝斑：右下冷色平衡品红 */}
+        <div
+          className="absolute top-2/3 right-1/3 w-[540px] h-[540px] rounded-full blur-3xl"
+          style={{ background: 'radial-gradient(circle, rgba(129,140,248,0.2), transparent 65%)' }}
         />
       </div>
     </div>

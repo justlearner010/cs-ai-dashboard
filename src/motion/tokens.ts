@@ -61,7 +61,9 @@ export function applyMotionCssVars(root: HTMLElement = document.documentElement)
  */
 export function staggerStyle(index: number): CSSProperties {
   return {
-    animation: `stagger-enter ${MOTION.duration.slow}ms ${MOTION.ease.cssOut} both`,
+    // fill 只能用 backwards（延迟期防闪现）：forwards/both 的常驻 after-fill 会让
+    // Chrome 把卡片 backdrop-filter 的采样挡在色场之外，玻璃洗成灰白（像素探针实证）
+    animation: `stagger-enter ${MOTION.duration.slow}ms ${MOTION.ease.cssOut} backwards`,
     animationDelay: `${index * MOTION.stagger.step}ms`,
   };
 }
