@@ -24,6 +24,7 @@ const COURSES_KEY = 'csAiAgentCoursesV3';
 const LOGS_KEY = 'csAiAgentLogsV3';
 const CLEAR_KEY = 'csAiAgentCelebrationClear';
 const STREAK_KEY = 'csAiAgentCelebrationStreak';
+const ACH_KEY = 'csAiAgentAchievements';
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -492,6 +493,57 @@ async function main() {
       await goto();
       await sleep(500);
       assert(!(await evalExpr(hasTest('celebration-streak-7'))), '刷新后里程碑不应重放');
+    });
+
+    // ——— 成就系统 ———
+    await test('achievements：空数据 → Lv1 + 0 解锁 + 无解锁提示', async () => {
+      await loadFixture({ courses: makeCourse([makeTodo()]), logs: [] });
+      await waitForExpr(hasTest('achievement-level'), { timeout: 8000 });
+      const info = await evalExpr(`(() => {
+        const lv = document.querySelector('[data-testid="achievement-level"]');
+        const wall = document.querySelector('[data-testid="achievement-wall"]');
+        return {
+          text: lv ? lv.textContent : '',
+          cards: wall ? wall.querySelectorAll('[data-unlocked]').length : 0,
+          unlocked: wall ? wall.querySelectorAll('[data-unlocked="true"]').length : 0,
+          toast: !!document.querySelector('[data-testid="achievement-unlock"]'),
+        };
+      })()`);
+      assert(
+        info.text.includes('Lv') && info.text.includes('见习') && info.text.includes('XP 0'),
+        `Lv1 见习 0 XP（实际 ${JSON.stringify(info.text.slice(0, 80))}）`,
+      );
+      assert(
+        info.cards === 20 && info.unlocked === 0 && !info.toast,
+        `20 卡 0 解锁无提示（${JSON.stringify({ cards: info.cards, unlocked: info.unlocked, toast: info.toast })}）`,
+      );
+      // 快照已静默回填为对象（key 存在 → 后续解锁才走公告通道）
+      const snap = JSON.parse((await readLocalStorage(ACH_KEY)) ?? 'null');
+      assert(snap !== null && typeof snap === 'object' && Object.keys(snap).length === 0,
+        `静默回填空对象（实际 ${await readLocalStorage(ACH_KEY)}）`);
+    });
+
+    await test('achievements：完成任务 → 快照写入 + 解锁提示 + 刷新不重放', async () => {
+      const text = '成就任务';
+      await loadFixture({
+        courses: makeCourse([makeTodo({ text })]),
+        logs: [],
+        extra: { [ACH_KEY]: '{}' },
+      });
+      await waitForExpr(hasTest('achievement-wall'), { timeout: 8000 });
+      assert(!(await evalExpr(hasTest('achievement-unlock'))), '初始不应有解锁提示');
+
+      await clickCheckboxByLabel(text);
+      await waitForExpr(hasTest('achievement-unlock'), { timeout: 4000 });
+      const snap = JSON.parse((await readLocalStorage(ACH_KEY)) ?? '{}');
+      assert(!!snap['first-task'], `快照含 first-task（实际 ${JSON.stringify(snap)}）`);
+      const ts = snap['first-task'];
+
+      await goto();
+      await sleep(600);
+      assert(!(await evalExpr(hasTest('achievement-unlock'))), '刷新后不应重放');
+      const snap2 = JSON.parse((await readLocalStorage(ACH_KEY)) ?? '{}');
+      assert(snap2['first-task'] === ts, '刷新后解锁时间戳不变');
     });
 
     // ——— 汇总 ———

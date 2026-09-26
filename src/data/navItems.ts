@@ -1,6 +1,7 @@
 import {
   Target,
   LayoutDashboard,
+  Trophy,
   Radar,
   TrendingUp,
   Calendar,
@@ -21,6 +22,7 @@ export interface SidebarItem {
 export const SIDEBAR_ITEMS: SidebarItem[] = [
   { id: 'section-today', label: '今日焦点', icon: Target },
   { id: 'section-overview', label: '概览', icon: LayoutDashboard },
+  { id: 'section-achievements', label: '成长成就', icon: Trophy },
   { id: 'section-radar', label: '能力雷达图', icon: Radar },
   { id: 'section-trend', label: '学习趋势', icon: TrendingUp },
   { id: 'section-heatmap', label: '学习热力图', icon: Calendar },
