@@ -1,6 +1,7 @@
 /**
  * 环境背景层（玻璃的折射基底）
  * - 淡彩基底渐变 + 多层柔和径向极光光斑（静态，只栅格化一次）——玻璃折射的色彩依据
+ * - 乐队 Logo 主图居中铺底：背景主视觉，加载失败自动隐藏（色场独立成立）
  * - 无漂移/浮动装饰：背景是舞台，不是演员
  *
  * 注：Logo 与角色图为官方素材，请确保仅限个人学习使用，
@@ -61,6 +62,21 @@ export function ThemeBackground() {
           style={{ background: 'radial-gradient(circle, rgba(129,140,248,0.2), transparent 65%)' }}
         />
       </div>
+
+      {/* Logo 主图背景：色场之上居中铺开——玻璃卡透出的不只是淡彩，还有这块主视觉。
+          静态无动画（舞台不做表演）；加载失败即隐藏，色场独立成立 */}
+      <img
+        src={`${import.meta.env.BASE_URL}MyGO!!!!!_logo.png`}
+        alt=""
+        aria-hidden
+        width={980}
+        height={480}
+        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2
+                   w-[min(92vw,980px)] h-auto select-none
+                   opacity-90 dark:opacity-75"
+        draggable={false}
+        onError={e => { e.currentTarget.style.display = 'none' }}
+      />
     </div>
   );
 }
