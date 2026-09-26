@@ -71,6 +71,22 @@ const VARIANTS: Record<Slot, string[]> = {
   trinket: ['徽记', '护符'],
 };
 
+/** 与 VARIANTS 同序的模板变体键（AvatarFigure EQ_TEMPLATES 索引） */
+const VARIANT_KEYS: Record<Slot, string[]> = {
+  weapon: ['blade', 'staff', 'bow'],
+  armor: ['chain', 'robe'],
+  helm: ['dome', 'circlet'],
+  boots: ['tall', 'sleek'],
+  trinket: ['brooch', 'amulet'],
+};
+
+/** 形象叠绘变体：与 equipmentName 同一 hash 序，保证名字后缀与画出的模板一致 */
+export function itemVariant(item: RpgItem): string {
+  const slot = item.slot ?? 'weapon';
+  const keys = VARIANT_KEYS[slot];
+  return keys[fnv1a(`${item.id}:v`) % keys.length];
+}
+
 const SCROLL_SUFFIX = ['卷轴', '秘典', '箴言', '星图'];
 
 const RARE_KEYWORDS = [

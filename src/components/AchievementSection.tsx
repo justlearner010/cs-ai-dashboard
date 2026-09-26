@@ -17,10 +17,13 @@ import {
   buildDungeons,
   resolveLoadout,
   parseLoadout,
+  itemVariant,
+  SLOTS,
   RPG_LOADOUT_KEY,
 } from '../utils/rpg';
 import type { RpgItem, Slot } from '../utils/rpg';
 import { AvatarFigure } from './AvatarFigure';
+import type { AvatarEquip } from './AvatarFigure';
 import { EquipmentPanel, EquipmentSlots } from './EquipmentPanel';
 import { DungeonPanel } from './DungeonPanel';
 import { SectionHeader } from './SectionHeader';
@@ -95,6 +98,17 @@ export function AchievementSection({ courses, logs }: AchievementSectionProps) {
     () => resolveLoadout(loadout, validEquipIds),
     [loadout, validEquipIds],
   );
+  const avatarEquip = useMemo<AvatarEquip[]>(() => {
+    const out: AvatarEquip[] = [];
+    for (const slot of SLOTS) {
+      const id = resolvedLoadout[slot];
+      if (!id) continue;
+      const item = catalog.find(i => i.id === id && i.slot === slot);
+      if (!item) continue;
+      out.push({ slot, rarity: item.rarity, variant: itemVariant(item) });
+    }
+    return out;
+  }, [resolvedLoadout, catalog]);
   const handleEquip = (item: RpgItem) => {
     if (!item.slot) return;
     setLoadout(prev => ({ ...prev, [item.slot as Slot]: item.id }));
@@ -195,7 +209,7 @@ export function AchievementSection({ courses, logs }: AchievementSectionProps) {
           data-testid="rpg-avatar"
           className="flex flex-col items-center justify-center gap-2 p-3 rounded-xl glass-subtle"
         >
-          <AvatarFigure level={growth.level} />
+          <AvatarFigure level={growth.level} equip={avatarEquip} />
           <span className="px-2 py-0.5 rounded-full bg-brand-100/80 dark:bg-brand-900/40 text-xs font-medium text-brand-700 dark:text-brand-300">
             {growth.title}
           </span>
