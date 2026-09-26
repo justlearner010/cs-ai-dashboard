@@ -1,12 +1,14 @@
 import { useMemo, useRef, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import type { Course } from '../types';
+import type { Course, LogEntry } from '../types';
 import { MapPin } from 'lucide-react';
 import { MOTION } from '../motion/tokens';
+import { findNextStep } from '../utils/helpers';
 import { SectionHeader } from './SectionHeader';
 
 interface LearningPathProps {
   courses: Course[];
+  logs: LogEntry[];
   onSelectCourse?: (courseId: string) => void;
 }
 
@@ -53,9 +55,10 @@ const ROW_GAP = 24;
 const COL_GAP_MIN = 20;
 const MIN_COL_WIDTH = NODE_WIDTH + COL_GAP_MIN;
 
-export function LearningPath({ courses, onSelectCourse }: LearningPathProps) {
+export function LearningPath({ courses, logs, onSelectCourse }: LearningPathProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState(760);
+  const nextCourseId = useMemo(() => findNextStep(courses, logs)?.course.id, [courses, logs]);
 
   useEffect(() => {
     const updateWidth = () => {
@@ -180,6 +183,12 @@ export function LearningPath({ courses, onSelectCourse }: LearningPathProps) {
           {/* Nodes */}
           {nodes.map((node, i) => {
             const optional = node.course.optional;
+            const total = node.course.todos.length;
+            const done = node.course.todos.filter(t => t.done).length;
+            const pct = total ? done / total : 0;
+            // 色阶镜像 helpers.progressColor（Tailwind 类不能当 SVG fill）
+            const barColor = pct < 0.3 ? '#94a3b8' : pct < 0.7 ? '#3b82f6' : '#10b981';
+            const isNext = node.id === nextCourseId;
             return (
             <motion.g
               key={node.id}
@@ -197,11 +206,22 @@ export function LearningPath({ courses, onSelectCourse }: LearningPathProps) {
                 height={NODE_HEIGHT}
                 rx={10}
                 fill={optional ? '#fdf6ee' : 'white'}
-                stroke={optional ? '#d6a2a2' : '#e2e8f0'}
-                strokeWidth={1.5}
-                strokeDasharray={optional ? '4 3' : undefined}
+                stroke={isNext ? '#d068b8' : optional ? '#d6a2a2' : '#e2e8f0'}
+                strokeWidth={isNext ? 2.5 : 1.5}
+                strokeDasharray={!isNext && optional ? '4 3' : undefined}
                 className="hover:stroke-brand-400 transition-all"
               />
+              {isNext && (
+                <text
+                  x={node.x + NODE_WIDTH / 2}
+                  y={node.y - 5}
+                  textAnchor="middle"
+                  fill="#d068b8"
+                  className="text-[9px] font-semibold"
+                >
+                  下一步
+                </text>
+              )}
               <text
                 x={node.x + NODE_WIDTH / 2}
                 y={node.y + 18}
@@ -232,6 +252,25 @@ export function LearningPath({ courses, onSelectCourse }: LearningPathProps) {
                   </text>
                 ))
               )}
+              {/* 课程级完成度进度条（节点底部 4px） */}
+              <rect
+                x={node.x + 6}
+                y={node.y + NODE_HEIGHT - 6}
+                width={NODE_WIDTH - 12}
+                height={4}
+                rx={2}
+                fill="#e2e8f0"
+              />
+              {pct > 0 && (
+                <rect
+                  x={node.x + 6}
+                  y={node.y + NODE_HEIGHT - 6}
+                  width={(NODE_WIDTH - 12) * pct}
+                  height={4}
+                  rx={2}
+                  fill={barColor}
+                />
+              )}
             </motion.g>
             );
           })}
@@ -239,7 +278,7 @@ export function LearningPath({ courses, onSelectCourse }: LearningPathProps) {
       </div>
 
       <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
-        点击节点可跳转到对应课程卡片。箭头表示建议的前置依赖关系。
+        点击节点可跳转到对应课程卡片。箭头表示建议的前置依赖；节点底部条是完成度，粉色描边是下一步建议。
       </p>
     </section>
   );

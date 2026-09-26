@@ -16,7 +16,7 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { ExternalLink, Plus, ClipboardList, CheckSquare, PlayCircle, BookOpen, Code, MessageCircle, BookText } from 'lucide-react';
+import { ExternalLink, Plus, ClipboardList, CheckSquare, PlayCircle, BookOpen, Code, MessageCircle, BookText, ChevronDown } from 'lucide-react';
 import type { Course, Todo, TodoType, ResourceType } from '../types';
 import { MOTION } from '../motion/tokens';
 import { progressColor } from '../utils/helpers';
@@ -26,6 +26,8 @@ import { SortableTodoItem } from './SortableTodoItem';
 
 interface CourseCardProps {
   course: Course;
+  collapsed: boolean;
+  onToggleCollapse: (courseId: string) => void;
   onToggleTodo: (courseId: string, todoId: string) => void;
   onAddTodo: (courseId: string, text: string, type: TodoType, dueDate?: string) => void;
   onDeleteTodo: (courseId: string, todoId: string) => void;
@@ -67,6 +69,8 @@ const typeConfig: Record<TodoType, { label: string; color: string; activeText: s
 
 export function CourseCard({
   course,
+  collapsed,
+  onToggleCollapse,
   onToggleTodo,
   onAddTodo,
   onDeleteTodo,
@@ -116,7 +120,7 @@ export function CourseCard({
 
   return (
     <div id={`course-${course.id}`} className="glass-subtle rounded-xl overflow-hidden scroll-mt-24">
-      <div className="p-4 sm:p-5 border-b border-white/60 dark:border-slate-700/60">
+      <div className={`p-4 sm:p-5 ${!collapsed ? 'border-b border-white/60 dark:border-slate-700/60' : ''}`}>
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
           <div className="min-w-0">
             <div className="flex items-center gap-2 mb-1 flex-wrap">
@@ -181,9 +185,23 @@ export function CourseCard({
               </div>
             )}
           </div>
-          <div className="text-left sm:text-right shrink-0">
-            <div className="text-2xl font-bold text-slate-900 dark:text-slate-100 tabular-nums whitespace-nowrap">{pct}%</div>
-            <div className="text-xs text-slate-500 dark:text-slate-400">{done}/{total}</div>
+          <div className="flex items-center gap-2 shrink-0">
+            <div className="text-left sm:text-right">
+              <div className="text-2xl font-bold text-slate-900 dark:text-slate-100 tabular-nums whitespace-nowrap">{pct}%</div>
+              <div className="text-xs text-slate-500 dark:text-slate-400">{done}/{total}</div>
+            </div>
+            <button
+              type="button"
+              onClick={() => onToggleCollapse(course.id)}
+              aria-expanded={!collapsed}
+              aria-label={`${collapsed ? '展开' : '收起'}课程 ${course.name}`}
+              title={collapsed ? '展开任务列表' : '收起任务列表'}
+              className="btn btn--icon text-slate-400 dark:text-slate-500 hover:text-brand-600 shrink-0"
+            >
+              <ChevronDown
+                className={`w-4 h-4 transition-transform duration-150 ${collapsed ? '-rotate-90' : ''}`}
+              />
+            </button>
           </div>
         </div>
         <div className="h-2.5 w-full rounded-full bg-slate-100 dark:bg-slate-700 overflow-hidden">
@@ -196,6 +214,7 @@ export function CourseCard({
         </div>
       </div>
 
+      {!collapsed && (
       <div className="p-4 sm:p-5">
         <div className="flex items-center justify-between mb-4 border-b border-white/60 dark:border-slate-700/60 pb-2">
           <div className="flex gap-2 overflow-x-auto">
@@ -299,6 +318,7 @@ export function CourseCard({
           </button>
         </div>
       </div>
+      )}
     </div>
   );
 }

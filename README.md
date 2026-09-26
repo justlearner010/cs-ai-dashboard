@@ -4,7 +4,7 @@
 
 ## 特性
 
-- 📊 **能力雷达图**：基于规范化的 7 大能力维度实时展示掌握度
+- 📊 **能力雷达图**：基于规范化的 9 大能力维度实时展示掌握度
 - 📅 **学习热力图**：GitHub 风格，直观展示最近一年学习时长分布
 - 📚 **课程与任务清单**：按知识点 / Lab / 问题反馈分类管理任务
 - 📝 **每日学习日志**：结构化记录知识点、Lab、问题与反思
@@ -25,6 +25,7 @@
 | 分布式系统 | RPC、复制、一致性、共识、容错 | RPC, Consistency, Consensus, Fault Tolerance |
 | 机器学习 / AI | ML、深度学习、LLM | ML, Deep Learning, LLM |
 | 智能体工程 | 工具编排、状态、调度、记忆、上下文、故障恢复、可观测性 | Tool Orchestration, State, Scheduling, Memory, Context, Failure Recovery, Observability |
+| 产品设计 | 界面设计、用户研究、产品需求分析 | UI Design, UX Research, Product Requirements |
 
 ## 开发
 
@@ -123,15 +124,11 @@ src/
 
 ## 数据来源
 
-课程清单参考了以下优质公开课程：
+课程清单共 25 门、按 6 个阶段组织，全部为公开优质课程：
 
-- Harvard CS50x
-- MIT Missing Semester
-- Berkeley CS61A / CS61B
-- MIT 6.006 / 6.042 / 6.031 / 6.5840
-- CMU 15-213
-- MIT 6.1810
-- Stanford CS144 / CS229 / CS224N
-- Berkeley CS186
-- 3Blue1Brown
-- LangGraph / Agent Runtime
+- **① 编程、算法与数学基础**：Harvard CS50x、MIT Missing Semester、MIT 6.006（算法）、MIT 6.1200（离散数学）、MIT 18.06（线性代数）、MIT 18.600（概率论）
+- **② 系统与分布式**：CMU 15-213、MIT 6.1810（操作系统）、Stanford CS144（网络）、Berkeley CS186（数据库）、MIT 6.5840（分布式）
+- **③ 机器学习与 LLM**：Karpathy Neural Networks: Zero to Hero、Stanford CS229、Stanford CS224N、LLM Inference & Serving
+- **④ Agent Runtime**：Build Your Own Agent Runtime、Agent Engine & Sandbox、HuggingFace Agents Course、DeepLearning.AI Evaluating AI Agents
+- **⑤ 全栈工程**：Full Stack Open、Harvard CS50W；Stanford CS146S（The Modern Software Developer）
+- **⑥ 产品与设计**：Figma Learn Design、Google UX Design、Introduction to Product Management

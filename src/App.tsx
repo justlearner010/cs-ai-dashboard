@@ -615,6 +615,7 @@ export default function App() {
               <section id="section-path" className="scroll-mt-24">
                 <LearningPath
                   courses={courses}
+                  logs={logs}
                   onSelectCourse={handleSelectCourseFromPath}
                 />
               </section>

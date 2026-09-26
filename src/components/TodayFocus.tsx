@@ -13,16 +13,21 @@ import {
   Download,
 } from 'lucide-react';
 import type { Course, LogEntry, Todo } from '../types';
-import { computeStreak, dueBadge, dueStatus, dueWindow, today, smoothScrollTo } from '../utils/helpers';
+import {
+  computeStreak,
+  dueBadge,
+  dueStatus,
+  dueWindow,
+  findNextStep,
+  pickNextItems,
+  smoothScrollTo,
+  today,
+  type FocusItem,
+} from '../utils/helpers';
 import { reminderSupported } from '../hooks/useTaskReminders';
 import { downloadFeishuSync } from '../utils/feishuSync';
 import { MOTION } from '../motion/tokens';
 import { SectionHeader } from './SectionHeader';
-
-interface FocusItem {
-  todo: Todo;
-  course: Course;
-}
 
 interface TodayFocusProps {
   courses: Course[];
@@ -50,14 +55,6 @@ function collectDueItems(courses: Course[]): FocusItem[] {
   return items.sort((a, b) =>
     (a.todo.dueDate || '').localeCompare(b.todo.dueDate || ''),
   );
-}
-
-function findNextStep(courses: Course[]): FocusItem | null {
-  for (const course of courses) {
-    const todo = course.todos.find(t => !t.done);
-    if (todo) return { todo, course };
-  }
-  return null;
 }
 
 // forwardRef：AnimatePresence(popLayout) 会注入 ref，需转发到 motion 根节点
@@ -211,6 +208,11 @@ export function TodayFocus({
     const dueToday = items.filter(i => dueWindow(i.todo) === 'today');
     const soonAll = items.filter(i => dueWindow(i.todo) === 'soon');
     const soon = soonAll.slice(0, 4);
+    // 到期窗口全空才出兜底组：纯展示，不写 dueDate、不进 dueWindow/celebration 口径
+    const fallback =
+      overdue.length + dueToday.length + soonAll.length === 0
+        ? pickNextItems(courses, logs, 5)
+        : [];
     return {
       list: [
         {
@@ -234,12 +236,24 @@ export function TodayFocus({
           tone: 'text-brand-600 dark:text-brand-400',
           items: soon,
         },
+        ...(fallback.length > 0
+          ? [
+              {
+                key: 'next',
+                label: '接下来建议',
+                icon: Sparkles,
+                tone: 'text-brand-600 dark:text-brand-400',
+                items: fallback,
+              },
+            ]
+          : []),
       ].filter(g => g.items.length > 0),
       soonHidden: soonAll.length - soon.length,
+      hasFallback: fallback.length > 0,
     };
-  }, [courses]);
+  }, [courses, logs]);
 
-  const nextStep = useMemo(() => findNextStep(courses), [courses]);
+  const nextStep = useMemo(() => findNextStep(courses, logs), [courses, logs]);
   const dateLabel = new Date().toLocaleDateString('zh-CN', {
     month: 'long',
     day: 'numeric',
@@ -347,12 +361,17 @@ export function TodayFocus({
               近 3 天还有 {groups.soonHidden} 项未展示
             </p>
           )}
-          {nextStep && (
+          {nextStep && !groups.hasFallback && (
             <p className="text-xs text-slate-500 dark:text-slate-400 pt-1 border-t border-slate-100 dark:border-slate-800 flex items-center gap-2">
               <Sparkles className="w-3.5 h-3.5 text-brand-500 shrink-0" />
               <span className="truncate">
                 没到期的也别闲着：{nextStep.course.name} → {nextStep.todo.text}
               </span>
+            </p>
+          )}
+          {groups.hasFallback && (
+            <p className="text-xs text-slate-400 dark:text-slate-500">
+              点任务行右侧日历图标设置截止日期，这里会自动聚合到期提醒
             </p>
           )}
         </div>

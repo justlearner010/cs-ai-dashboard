@@ -46,7 +46,7 @@ export const defaultCourses: Omit<Course, "todos">[] = [
     name: "MIT 6.1210 / 6.006",
     fullName: "Introduction to Algorithms",
     url: "https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-fall-2011/",
-    skills: ["Algorithms"],
+    skills: ["Data Structures", "Algorithms"],
     prerequisites: ["mit-math"],
     resources: [
       {
@@ -146,7 +146,7 @@ export const defaultCourses: Omit<Course, "todos">[] = [
     name: "CMU 15-213",
     fullName: "Introduction to Computer Systems",
     url: "https://www.cs.cmu.edu/~213/",
-    skills: ["Computer Organization"],
+    skills: ["Computer Organization", "Concurrency"],
     prerequisites: ["cs50"],
     resources: [
       {

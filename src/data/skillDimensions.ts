@@ -74,6 +74,14 @@ export const skillDimensions: SkillDimension[] = [
     color: '#6366f1',
     bgColor: '#eef2ff',
   },
+  {
+    key: 'product',
+    label: '产品设计',
+    description: '界面设计、用户研究、产品需求分析',
+    skills: ['UI Design', 'UX Research', 'Product Requirements'],
+    color: '#d946ef',
+    bgColor: '#fdf4ff',
+  },
 ];
 
 export const skillDimensionMap = new Map(skillDimensions.map(d => [d.key, d]));
