@@ -22,8 +22,15 @@ import {
   RPG_LOADOUT_KEY,
 } from '../utils/rpg';
 import type { RpgItem, Slot } from '../utils/rpg';
+import {
+  ATTR_STORAGE_KEY,
+  parseAttrs,
+  resolveAttrs,
+} from '../utils/attrs';
+import type { AttrKey } from '../utils/attrs';
 import { AvatarFigure } from './AvatarFigure';
 import type { AvatarEquip } from './AvatarFigure';
+import { AttributePanel } from './AttributePanel';
 import { EquipmentPanel, EquipmentSlots } from './EquipmentPanel';
 import { DungeonPanel } from './DungeonPanel';
 import { SectionHeader } from './SectionHeader';
@@ -120,6 +127,23 @@ export function AchievementSection({ courses, logs }: AchievementSectionProps) {
       return next;
     });
   };
+  const [attrs, setAttrs] = useLocalStorage<Partial<Record<AttrKey, number>>>(
+    ATTR_STORAGE_KEY,
+    {},
+    { parse: parseAttrs },
+  );
+  const { allocated, unspent } = useMemo(
+    () => resolveAttrs(attrs, growth.level),
+    [attrs, growth.level],
+  );
+  const handleAttrInc = (key: AttrKey) => {
+    if (unspent <= 0) return;
+    setAttrs(prev => ({ ...prev, [key]: (prev[key] ?? 0) + 1 }));
+  };
+  const handleAttrDec = (key: AttrKey) => {
+    setAttrs(prev => ({ ...prev, [key]: Math.max(0, (prev[key] ?? 0) - 1) }));
+  };
+  const handleAttrReset = () => setAttrs({});
 
   // 解锁 diff：key 缺失（首访/fixture clear）→ 静默回填只写时刻不公告；
   // key 存在（含 {}）才 diff 公告——快照本身就是永久抑制，不设独立抑制键
@@ -260,7 +284,7 @@ export function AchievementSection({ courses, logs }: AchievementSectionProps) {
         </div>
       </div>
 
-      <div className="grid lg:grid-cols-2 gap-4 mb-4">
+      <div className="grid lg:grid-cols-2 xl:grid-cols-3 gap-4 mb-4">
         <EquipmentPanel
           catalog={catalog}
           doneIds={doneIds}
@@ -268,6 +292,14 @@ export function AchievementSection({ courses, logs }: AchievementSectionProps) {
           onEquip={handleEquip}
         />
         <DungeonPanel dungeons={dungeons} />
+        <AttributePanel
+          allocated={allocated}
+          unspent={unspent}
+          onInc={handleAttrInc}
+          onDec={handleAttrDec}
+          onReset={handleAttrReset}
+          className="lg:col-span-2 xl:col-span-1"
+        />
       </div>
 
       <div
