@@ -13,138 +13,311 @@ interface AvatarFigureProps {
   className?: string;
 }
 
+/* 像素小人：22×25 网格五档合成图（含自动描边），字符 → 调色板 */
+const FILL: Record<string, string> = {
+  o: '#2f2a33', h: '#4f4238', H: '#6a5b4e', s: '#f5c9a6', S: '#e8b08c',
+  e: '#2b2b33', m: '#b56a5a', t: '#d6cfc2', T: '#b8ae9d', p: '#7a6852',
+  k: '#54443a', c: '#d068b8', d: '#8b6b4a', g: '#34d399', a: '#d97706',
+  A: '#b45309', u: '#9d3d84', l: '#fbbf24', r: '#d068b8', n: '#fcd34d',
+};
+/** 'n'（光环/星芒/光晕）半透明，与设计稿 alpha=110 对齐 */
+const ALPHA_N = 110 / 255;
+
+const GRIDS: Record<AvatarBand, string[]> = {
+  1: [
+    '......................',
+    '......................',
+    '......................',
+    '......................',
+    '.....oooooooooo.......',
+    '....oohhhhhhhhoo......',
+    '....ohhHhhhhHhho......',
+    '....ohhhhhhhhhho......',
+    '....ohssssssssho......',
+    '....ohseesseesho......',
+    '....ohSesseesSho......',
+    '....ohsssmmsssho......',
+    '....oossssssssoo......',
+    '...oootttsstttooo.....',
+    '...otttttttttttto.....',
+    '...otttttttttttto.....',
+    '...ossttttttttsso.....',
+    '...ossttttttttsso.....',
+    '...oooTTTTTTTTooo.....',
+    '.....opppoopppo.......',
+    '.....opppoopppo.......',
+    '.....opppoopppo.......',
+    '....oopppoopppoo......',
+    '....okkkkookkkko......',
+    '....oooooooooooo......',
+  ],
+  2: [
+    '......................',
+    '......................',
+    '......................',
+    '......................',
+    '.....oooooooooo..oooo.',
+    '....oohhhhhhhhoo.oggo.',
+    '....ohhHhhhhHhho.ogoo.',
+    '....ohhhhhhhhhho.oddo.',
+    '....ohssssssssho.oddo.',
+    '....ohseesseesho.oddo.',
+    '....ohSesseesSho.oddo.',
+    '....ohsssmmsssho.oddo.',
+    '....oossssssssoo.oddo.',
+    '...oooccccccccooooddo.',
+    '...ottttttttccttooddo.',
+    '...otttttttttcttooddo.',
+    '...osstttttttcssooddo.',
+    '...osstttttttcssooddo.',
+    '...oooTTTTTTTTooooddo.',
+    '.....opppoopppo..oddo.',
+    '.....opppoopppo..oddo.',
+    '.....opppoopppo..oddo.',
+    '....oopppoopppoo.oddo.',
+    '....okkkkookkkko.oddo.',
+    '....oooooooooooo.oooo.',
+  ],
+  3: [
+    '......................',
+    '......................',
+    '......................',
+    '......................',
+    '.....oooooooooo..oooo.',
+    '....oohhhhhhhhoo.oggo.',
+    '....ohhHhhhhHhho.ogoo.',
+    '....ohhhhhhhhhho.oddo.',
+    '....ohssssssssho.oddo.',
+    '....ohseesseesho.oddo.',
+    '....ohSesseesSho.oddo.',
+    '....ohsssmmsssho.oddo.',
+    '....oossssssssoo.oddo.',
+    '.oooooccccccccooooddo.',
+    '.ouuttttttttccttuuddo.',
+    '.ouutttttttttcttuuddo.',
+    '.ouusstttttttcssuuddo.',
+    '.ouussaaaAAaaassuuddo.',
+    '.ouuooaaaAAaaaoouuddo.',
+    '.ouuoopppoopppoouuddo.',
+    '.ouuoopppoopppoouuddo.',
+    '.ouuoopppoopppoouuddo.',
+    '.ouuoopppoopppoouuddo.',
+    '.ouuukkkkookkkkuuuddo.',
+    '.ouuuoooooooooouuuooo.',
+  ],
+  4: [
+    '........nnnnnn........',
+    '......nn......nn......',
+    '.....n..........n.....',
+    '......................',
+    '.....oooooooooo..oooo.',
+    '....oohhhhhhhhoo.oggo.',
+    '....ohhHhhhhHhho.ogoo.',
+    '....ohhhhhhhhhho.oddo.',
+    '....ohssssssssho.oddo.',
+    '....ohseesseesho.oddo.',
+    '....ohSesseesSho.oddo.',
+    '....ohsssmmsssho.oddo.',
+    '....oossssssssoo.oddo.',
+    '.oooooccccccccooooddo.',
+    '.ouuttttttttccttuuddo.',
+    '.ouutttttttttcttuuddo.',
+    '.ouusstttttttcssuuddo.',
+    '.ouussaaaAAaaassuuddo.',
+    '.ouuooaaaAAaaaoouuddo.',
+    '.ouuoopppoopppoouuddo.',
+    '.ouuoopppoopppoouuddo.',
+    '.ouuoopppoopppoouuddo.',
+    '.ouuoopppoopppoouuddo.',
+    '.ouuukkkkookkkkuuuddo.',
+    '.ouuuoooooooooouuuooo.',
+  ],
+  5: [
+    '........nnnnnn........',
+    '.....onnoooooonn......',
+    '.n...nloolooloo.n...n.',
+    'nnn..olllrrlllo....nnn',
+    '.n...olllrrlllnn.ooon.',
+    '....onhhhhhhhhnnnoggo.',
+    'n...nhhHhhhhHhhnnngoon',
+    'nn.nnhhhhhhhhhho.nddnn',
+    'n.nnnhssssssssho.nddon',
+    '..nnohseesseesho.oddo.',
+    '..nnohSesseesSho.oddo.',
+    '..nnohsssmmsssho.oddo.',
+    '..nnoossssssssoo.oddo.',
+    '.onnnoccccccccooonddo.',
+    '.ouuttttttttccttuuddo.',
+    '.ouutttttttttcttuuddo.',
+    '.ouusstttttttcssuuddo.',
+    '.ouussaaaAAaaassuuddo.',
+    '.ouuooaaaAAaaaoouuddo.',
+    '.ouuoopppoopppoouuddo.',
+    '.ouuoopppoopppoouuddo.',
+    '.ouuoopppoopppoouuddo.',
+    '.ouuoopppoopppoouuddo.',
+    '.ouuukkkkookkkkuuuddo.',
+    '.ouuuoooooooooouuuooo.',
+  ]
+};
+
+const GROUP_ORDER = ['5', '3', '1', '2', '3b', '4', '5b'] as const;
+const GROUP_MIN_BAND: Record<string, AvatarBand> = {
+  '5': 5, '3': 3, '1': 1, '2': 2, '3b': 3, '4': 4, '5b': 5,
+};
+
+type Cell = { r: number; c: number; ch: string };
+type Rect = Cell & { w: number; h: number };
+
+function diffCells(from: AvatarBand, to: AvatarBand): Cell[] {
+  const a = GRIDS[from];
+  const b = GRIDS[to];
+  const out: Cell[] = [];
+  for (let r = 0; r < b.length; r++) {
+    for (let c = 0; c < b[r].length; c++) {
+      if (a[r][c] !== b[r][c]) out.push({ r, c, ch: b[r][c] });
+    }
+  }
+  return out;
+}
+
+function nonEmpty(band: AvatarBand): Cell[] {
+  const g = GRIDS[band];
+  const out: Cell[] = [];
+  for (let r = 0; r < g.length; r++) {
+    for (let c = 0; c < g[r].length; c++) {
+      if (g[r][c] !== '.') out.push({ r, c, ch: g[r][c] });
+    }
+  }
+  return out;
+}
+
+/**
+ * 各 data-band 组的归属单元格（按档位递进差分切分图层）。
+ * 渲染字符一律取当前档 GRIDS 的最终字符——同一格无论落在几组，
+ * 画出的颜色都相同，故组间叠绘顺序（DOM 5,3,1,2,3b,4,5b）不影响成像。
+ * 半透明 'n' 例外：同格多组会叠加加深，故只归 DOM 最右一组绘制。
+ */
+const NOMINAL: Record<string, Cell[]> = (() => {
+  const d12 = diffCells(1, 2);
+  const d23 = diffCells(2, 3);
+  const d34 = diffCells(3, 4);
+  const d45 = diffCells(4, 5);
+  return {
+    '5': d45.filter(x => x.ch === 'n'),
+    '3': d23.filter(x => x.ch === 'u' || x.ch === 'o'),
+    '1': nonEmpty(1),
+    '2': d12,
+    '3b': d23.filter(x => x.ch === 'a' || x.ch === 'A'),
+    '4': d34,
+    '5b': d45.filter(x => x.ch !== 'n'),
+  };
+})();
+
+/** 水平游程合并 + 垂直同列同色拼接 → 最少 rect */
+function toRects(cells: Cell[]): Rect[] {
+  const rows = new Map<number, Cell[]>();
+  for (const cell of cells) {
+    const list = rows.get(cell.r);
+    if (list) list.push(cell);
+    else rows.set(cell.r, [cell]);
+  }
+  const runs: Rect[] = [];
+  for (const [r, list] of rows) {
+    list.sort((a, b) => a.c - b.c);
+    let start = 0;
+    for (let i = 1; i <= list.length; i++) {
+      if (i === list.length || list[i].c !== list[i - 1].c + 1 || list[i].ch !== list[start].ch) {
+        runs.push({ r, c: list[start].c, w: i - start, h: 1, ch: list[start].ch });
+        start = i;
+      }
+    }
+  }
+  runs.sort((a, b) => a.r - b.r || a.c - b.c);
+  const merged: Rect[] = [];
+  const tails = new Map<string, Rect>();
+  for (const run of runs) {
+    const key = `${run.c}|${run.w}|${run.ch}`;
+    const tail = tails.get(key);
+    if (tail && tail.r + tail.h === run.r) {
+      tail.h += 1;
+      continue;
+    }
+    const rect = { ...run };
+    merged.push(rect);
+    tails.set(key, rect);
+  }
+  return merged;
+}
+
+function buildBand(band: AvatarBand): Record<string, Rect[]> {
+  const grid = GRIDS[band];
+  const present = GROUP_ORDER.filter(key => GROUP_MIN_BAND[key] <= band);
+  const nOwner = new Map<string, string>();
+  for (const key of present) {
+    for (const cell of NOMINAL[key]) {
+      if (grid[cell.r][cell.c] === 'n') nOwner.set(`${cell.r},${cell.c}`, key);
+    }
+  }
+  const out: Record<string, Rect[]> = {};
+  for (const key of present) {
+    const cells: Cell[] = [];
+    for (const cell of NOMINAL[key]) {
+      const ch = grid[cell.r][cell.c];
+      if (ch === '.') continue;
+      if (ch === 'n' && nOwner.get(`${cell.r},${cell.c}`) !== key) continue;
+      cells.push({ r: cell.r, c: cell.c, ch });
+    }
+    out[key] = toRects(cells);
+  }
+  return out;
+}
+
+const BAND_GROUPS: Record<AvatarBand, Record<string, Rect[]>> = {
+  1: buildBand(1),
+  2: buildBand(2),
+  3: buildBand(3),
+  4: buildBand(4),
+  5: buildBand(5),
+};
+
 export function AvatarFigure({ level, className = '' }: AvatarFigureProps) {
   const reduce = useReducedMotion();
   const band = avatarBand(level);
   const dur = MOTION.duration.base / 1000;
   const ease = MOTION.ease.out;
   const layer = band >= 2 && !reduce
-    ? { initial: { opacity: 0, y: 6 }, animate: { opacity: 1, y: 0 }, transition: { duration: dur, ease } }
+    ? { initial: { opacity: 0, y: 0.75 }, animate: { opacity: 1, y: 0 }, transition: { duration: dur, ease } }
     : band >= 2
       ? { initial: false as const, animate: { opacity: 1, y: 0 } }
       : null;
+  const groups = BAND_GROUPS[band];
 
   return (
     <svg
-      viewBox="0 0 160 200"
+      viewBox="0 0 22 25"
       className={`w-44 h-auto shrink-0 ${className}`}
       role="img"
       aria-label={`RPG 形象，等级 ${level}`}
+      shapeRendering="crispEdges"
     >
-      {band >= 5 && (
-        <motion.g data-band="5" {...layer}>
-          <circle cx="80" cy="84" r="74" className="fill-brand-300 dark:fill-brand-500" opacity="0.14" />
-          <circle cx="80" cy="84" r="56" className="fill-brand-200 dark:fill-brand-400" opacity="0.16" />
-        </motion.g>
-      )}
-
-      {band >= 3 && (
-        <motion.g data-band="3" {...layer}>
-          <path
-            d="M54,90 Q80,82 106,90 L114,154 Q80,164 46,154 Z"
-            className="fill-brand-700 dark:fill-brand-900"
+      {GROUP_ORDER.map(key => {
+        const rects = groups[key];
+        if (!rects) return null;
+        const pixels = rects.map(q => (
+          <rect
+            key={`${q.r}-${q.c}`}
+            x={q.c}
+            y={q.r}
+            width={q.w}
+            height={q.h}
+            fill={FILL[q.ch]}
+            fillOpacity={q.ch === 'n' ? ALPHA_N : undefined}
           />
-        </motion.g>
-      )}
-
-      {/* 基础体：圆脸大眼 Q 版小人（布衣） */}
-      <g data-band="1">
-        <rect x="74" y="78" width="12" height="12" rx="3" className="fill-rose-100 dark:fill-rose-200" />
-        <path
-          d="M56,92 Q80,86 104,92 L108,134 Q80,142 52,134 Z"
-          className="fill-slate-300 dark:fill-slate-600"
-        />
-        <rect x="44" y="94" width="11" height="32" rx="5.5" className="fill-slate-300 dark:fill-slate-600" />
-        <rect x="105" y="94" width="11" height="32" rx="5.5" className="fill-slate-300 dark:fill-slate-600" />
-        <rect x="63" y="138" width="13" height="24" rx="4" className="fill-slate-400 dark:fill-slate-500" />
-        <rect x="84" y="138" width="13" height="24" rx="4" className="fill-slate-400 dark:fill-slate-500" />
-        <rect x="57" y="159" width="21" height="9" rx="4" className="fill-stone-600 dark:fill-stone-500" />
-        <rect x="82" y="159" width="21" height="9" rx="4" className="fill-stone-600 dark:fill-stone-500" />
-        <circle cx="80" cy="54" r="30" className="fill-rose-100 dark:fill-rose-200" />
-        <path
-          d="M52,54 C50,30 62,20 80,20 C98,20 110,30 108,54 C104,42 96,34 80,34 C64,34 56,42 52,54 Z"
-          className="fill-slate-700 dark:fill-slate-300"
-        />
-        <circle cx="69" cy="58" r="5" className="fill-slate-900 dark:fill-slate-100" />
-        <circle cx="91" cy="58" r="5" className="fill-slate-900 dark:fill-slate-100" />
-        <circle cx="70.5" cy="56.5" r="1.6" fill="#fff" />
-        <circle cx="92.5" cy="56.5" r="1.6" fill="#fff" />
-        <ellipse cx="60" cy="67" rx="6" ry="3" className="fill-rose-300" opacity="0.7" />
-        <ellipse cx="100" cy="67" rx="6" ry="3" className="fill-rose-300" opacity="0.7" />
-        <path
-          d="M75,71 Q80,76 85,71"
-          fill="none"
-          strokeWidth="2"
-          strokeLinecap="round"
-          className="stroke-slate-700 dark:stroke-slate-300"
-        />
-        <circle cx="49.5" cy="130" r="5.5" className="fill-rose-100 dark:fill-rose-200" />
-        <circle cx="110.5" cy="130" r="5.5" className="fill-rose-100 dark:fill-rose-200" />
-      </g>
-
-      {band >= 2 && (
-        <motion.g data-band="2" {...layer}>
-          <path
-            d="M62,86 Q80,96 98,86 L100,98 Q80,108 60,98 Z"
-            className="fill-brand-500"
-          />
-          <path d="M94,96 L104,122 L94,120 L88,100 Z" className="fill-brand-600" />
-          <rect x="116" y="66" width="7" height="86" rx="3.5" className="fill-stone-600 dark:fill-stone-500" />
-        </motion.g>
-      )}
-
-      {band >= 3 && (
-        <motion.g data-band="3b" {...layer}>
-          <rect x="54" y="114" width="52" height="9" rx="2" className="fill-amber-700" />
-          <rect x="74" y="114" width="12" height="9" rx="2" className="fill-amber-400" />
-          <path d="M119.5,48 l9,11 -9,11 -9,-11 z" className="fill-emerald-400" />
-        </motion.g>
-      )}
-
-      {band >= 4 && (
-        <motion.g data-band="4" {...layer}>
-          <ellipse
-            cx="80"
-            cy="16"
-            rx="27"
-            ry="7"
-            fill="none"
-            strokeWidth="3.5"
-            className="stroke-amber-400"
-          />
-          <path d="M80,123 l5,6 -5,6 -5,-6 z" className="fill-brand-400" opacity="0.85" />
-          <circle cx="67" cy="129" r="3" className="fill-brand-400" opacity="0.85" />
-          <circle cx="93" cy="129" r="3" className="fill-brand-400" opacity="0.85" />
-          <path
-            d="M40,44 l2,5 5,2 -5,2 -2,5 -2,-5 -5,-2 5,-2 z"
-            className="fill-amber-400"
-          />
-          <path
-            d="M126,34 l1.6,4 4,1.6 -4,1.6 -1.6,4 -1.6,-4 -4,-1.6 4,-1.6 z"
-            className="fill-amber-400"
-          />
-        </motion.g>
-      )}
-
-      {band >= 5 && (
-        <motion.g data-band="5b" {...layer}>
-          <path
-            d="M58,32 L58,22 L68,28 L74,15 L80,25 L86,15 L92,28 L102,22 L102,32 Z"
-            className="fill-amber-400 stroke-amber-600"
-            strokeWidth="1.5"
-            strokeLinejoin="round"
-          />
-          <circle cx="68" cy="27" r="1.8" className="fill-brand-500" />
-          <circle cx="80" cy="23" r="1.8" className="fill-brand-500" />
-          <circle cx="92" cy="27" r="1.8" className="fill-brand-500" />
-          <rect x="115.5" y="78" width="8" height="5" rx="1.5" className="fill-amber-400" />
-          <rect x="115.5" y="132" width="8" height="5" rx="1.5" className="fill-amber-400" />
-          <path
-            d="M119.5,34 l1.8,4.4 4.4,1.8 -4.4,1.8 -1.8,4.4 -1.8,-4.4 -4.4,-1.8 4.4,-1.8 z"
-            className="fill-amber-300"
-          />
-        </motion.g>
-      )}
+        ));
+        if (key === '1') return <g key="1" data-band="1">{pixels}</g>;
+        return <motion.g key={key} data-band={key} {...layer}>{pixels}</motion.g>;
+      })}
     </svg>
   );
 }
