@@ -621,6 +621,100 @@ async function main() {
       assert(!slotText.includes(name), `卸下后槽位不再显示物品（${slotText}）`);
     });
 
+    // ——— RPG 属性加点（三期）———
+    await test('rpg-attr：空数据 → 六行 + 可用 0 + 加号/洗点禁用 + key 不落盘', async () => {
+      await loadFixture({ courses: makeCourse([makeTodo()]), logs: [] });
+      await waitForExpr(hasTest('rpg-attrs'), { timeout: 8000 });
+      const info = await evalExpr(`(() => {
+        const panel = document.querySelector('[data-testid="rpg-attrs"]');
+        return {
+          rows: panel.querySelectorAll('[data-testid^="rpg-attr-row-"]').length,
+          unspent: document.querySelector('[data-testid="rpg-attr-unspent"]')?.textContent.trim() ?? '',
+          plusDisabled: [...panel.querySelectorAll('button[aria-label^="增加"]')].every(b => b.disabled),
+          resetDisabled: document.querySelector('[data-testid="rpg-attr-reset"]').disabled,
+        };
+      })()`);
+      assert(info.rows === 6, `六行属性（${JSON.stringify(info)}）`);
+      assert(info.unspent === '可用点数 0', `可用点数 0（${info.unspent}）`);
+      assert(info.plusDisabled, 'Lv1 时全部 + 禁用');
+      assert(info.resetDisabled, '零分配时洗点禁用');
+      const raw = await readLocalStorage('csAiAgentRpgAttrs');
+      assert(raw === null, `挂载不写 key（实际 ${raw}）`);
+    });
+
+    await test('rpg-attr：升级 fixture → 可用点数 2×(L-1)；点 + → key 写入', async () => {
+      await loadFixture({ courses: makeCourse([makeTodo()]), logs: [makeLog({ hours: 60 })] });
+      await waitForExpr(hasTest('rpg-attrs'), { timeout: 8000 });
+      // 等级数字有动画：等 DOM 等级与静态点数公式自洽（同时验证公式）
+      const stable = `(() => {
+        const m = document.querySelector('[data-testid="achievement-level"]').textContent.match(/Lv(\\d+)/);
+        if (!m) return false;
+        const u = document.querySelector('[data-testid="rpg-attr-unspent"]').textContent.trim();
+        return u === '可用点数 ' + 2 * (Number(m[1]) - 1);
+      })()`;
+      await waitForExpr(stable, { timeout: 8000 });
+      const lv = await evalExpr(
+        `Number(document.querySelector('[data-testid="achievement-level"]').textContent.match(/Lv(\\d+)/)[1])`,
+      );
+      assert(lv >= 2, `fixture 生效 Lv${lv}`);
+      const granted = 2 * (lv - 1);
+      await evalExpr(
+        `document.querySelector('[data-testid="rpg-attrs"] button[aria-label="增加力量"]').click(); true`,
+      );
+      await waitForExpr(
+        `document.querySelector('[data-testid="rpg-attr-value-str"]').textContent.trim() === '1' &&
+         document.querySelector('[data-testid="rpg-attr-unspent"]').textContent.trim() === '可用点数 ${granted - 1}'`,
+        { timeout: 4000 },
+      );
+      const raw = JSON.parse((await readLocalStorage('csAiAgentRpgAttrs')) ?? 'null');
+      assert(raw && raw.str === 1, `key 写入 {str:1}（${JSON.stringify(raw)}）`);
+    });
+
+    await test('rpg-attr：刷新持久 + − 回收 + 洗点守恒', async () => {
+      await loadFixture({ courses: makeCourse([makeTodo()]), logs: [makeLog({ hours: 60 })] });
+      await waitForExpr(hasTest('rpg-attrs'), { timeout: 8000 });
+      const stable = `(() => {
+        const m = document.querySelector('[data-testid="achievement-level"]').textContent.match(/Lv(\\d+)/);
+        if (!m) return false;
+        const u = document.querySelector('[data-testid="rpg-attr-unspent"]').textContent.trim();
+        return u === '可用点数 ' + 2 * (Number(m[1]) - 1);
+      })()`;
+      await waitForExpr(stable, { timeout: 8000 });
+      const lv = await evalExpr(
+        `Number(document.querySelector('[data-testid="achievement-level"]').textContent.match(/Lv(\\d+)/)[1])`,
+      );
+      const granted = 2 * (lv - 1);
+      const plus = `[data-testid="rpg-attrs"] button[aria-label="增加力量"]`;
+      await evalExpr(`document.querySelector(${JSON.stringify(plus)}).click(); true`);
+      await evalExpr(`document.querySelector(${JSON.stringify(plus)}).click(); true`);
+      await waitForExpr(
+        `document.querySelector('[data-testid="rpg-attr-value-str"]').textContent.trim() === '2' &&
+         document.querySelector('[data-testid="rpg-attr-unspent"]').textContent.trim() === '可用点数 ${granted - 2}'`,
+        { timeout: 4000 },
+      );
+      await goto();
+      await waitForExpr(hasTest('rpg-attrs'), { timeout: 8000 });
+      await waitForExpr(
+        `document.querySelector('[data-testid="rpg-attr-value-str"]').textContent.trim() === '2' &&
+         document.querySelector('[data-testid="rpg-attr-unspent"]').textContent.trim() === '可用点数 ${granted - 2}'`,
+        { timeout: 8000 },
+      );
+      await evalExpr(
+        `document.querySelector('[data-testid="rpg-attrs"] button[aria-label="减少力量"]').click(); true`,
+      );
+      await waitForExpr(
+        `document.querySelector('[data-testid="rpg-attr-value-str"]').textContent.trim() === '1'`,
+        { timeout: 4000 },
+      );
+      await evalExpr(`document.querySelector('[data-testid="rpg-attr-reset"]').click(); true`);
+      await waitForExpr(
+        `localStorage.getItem('csAiAgentRpgAttrs') === '{}' &&
+         document.querySelector('[data-testid="rpg-attr-unspent"]').textContent.trim() === '可用点数 ${granted}' &&
+         document.querySelector('[data-testid="rpg-attr-value-str"]').textContent.trim() === '0'`,
+        { timeout: 4000 },
+      );
+    });
+
     // ——— 汇总 ———
     failures = results.filter(r => !r.ok).length;
     console.log(`\n${results.length - failures}/${results.length} 通过`);
